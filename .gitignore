@@ -3,3 +3,5 @@
 __pycache__/
 /cases/generated/
 /driver/target/
+/results/runs/
+/results/scratch/

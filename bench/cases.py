@@ -25,6 +25,7 @@ class Case:
     name: str
     path: Path
     family: str
+    columns: str
     ambient_dimension: int
     cube_count: int
     graded: bool
@@ -137,6 +138,7 @@ def load_case(name, manifest):
         name=name,
         path=entry.path,
         family=record["family"],
+        columns=entry.columns,
         ambient_dimension=record["ambient_dimension"],
         cube_count=record["cube_count"],
         graded=record["graded"],

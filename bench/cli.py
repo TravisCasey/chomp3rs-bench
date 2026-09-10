@@ -2,13 +2,16 @@
 
 `generate` writes the case files that are generated from a seed and the sidecar
 of every case that has none; `convert`, `run`, `check`, `summarize` and `plot`
-each take a tier name and act on the runs that tier asks for.
+each take a tier name and act on the runs that tier asks for. `convert` and
+`run` narrow to one tool with `--tool`, `run` narrows to one case with `--case`,
+and `--dry-run` prints what `run` would do and what it would cost at worst
+without running anything.
 """
 
 import argparse
 from pathlib import Path
 
-from bench import cases, generators, manifest
+from bench import cases, generators, manifest, runner
 
 DEFAULT_MANIFEST = Path("cases/manifest.toml")
 TIER_SUBCOMMANDS = ("convert", "run", "check", "summarize", "plot")
@@ -21,15 +24,31 @@ def main():
     generate.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     generate.add_argument("--only")
     generate.add_argument("--force", action="store_true")
+    tier_parsers = {}
     for name in TIER_SUBCOMMANDS:
         subparser = subparsers.add_parser(name)
         subparser.add_argument("tier")
         subparser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+        tier_parsers[name] = subparser
+    tier_parsers["convert"].add_argument("--tool")
+    tier_parsers["run"].add_argument("--tool")
+    tier_parsers["run"].add_argument("--case")
+    tier_parsers["run"].add_argument("--dry-run", action="store_true")
     arguments = parser.parse_args()
     loaded = manifest.load(arguments.manifest)
     if arguments.subcommand == "generate":
         run_generators(loaded, arguments.only, arguments.force)
         write_missing_sidecars(loaded)
+    elif arguments.subcommand == "convert":
+        runner.convert_tier(loaded, arguments.tier, only_tool=arguments.tool)
+    elif arguments.subcommand == "run":
+        runner.run_tier(
+            loaded,
+            arguments.tier,
+            only_tool=arguments.tool,
+            only_case=arguments.case,
+            dry_run=arguments.dry_run,
+        )
     else:
         print_runs(loaded, arguments.tier)
 
