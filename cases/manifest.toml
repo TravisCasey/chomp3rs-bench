@@ -70,6 +70,267 @@ family = "flows"
 columns = "plain"
 size = "medium"
 
+[cases.s1_d2]
+file = "generated/s1_d2.csv"
+family = "s1"
+columns = "plain"
+size = "small"
+generator = "s1"
+seed = 1
+parameters = { dimension = 2, samples = 200 }
+
+[cases.s1_d4]
+file = "generated/s1_d4.csv"
+family = "s1"
+columns = "plain"
+size = "small"
+generator = "s1"
+seed = 2
+parameters = { dimension = 4, samples = 200 }
+
+[cases.s1_d6]
+file = "generated/s1_d6.csv"
+family = "s1"
+columns = "plain"
+size = "small"
+generator = "s1"
+seed = 3
+parameters = { dimension = 6, samples = 200 }
+
+[cases.s1_d8]
+file = "generated/s1_d8.csv"
+family = "s1"
+columns = "plain"
+size = "small"
+generator = "s1"
+seed = 4
+parameters = { dimension = 8, samples = 200 }
+
+[cases.s1_d12]
+file = "generated/s1_d12.csv"
+family = "s1"
+columns = "plain"
+size = "small"
+generator = "s1"
+seed = 5
+parameters = { dimension = 12, samples = 200 }
+
+[cases.s1_d16]
+file = "generated/s1_d16.csv"
+family = "s1"
+columns = "plain"
+size = "medium"
+generator = "s1"
+seed = 6
+parameters = { dimension = 16, samples = 200 }
+
+[cases.torus_d3]
+file = "generated/torus_d3.csv"
+family = "torus"
+columns = "plain"
+size = "medium"
+generator = "torus"
+seed = 7
+parameters = { dimension = 3, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
+
+[cases.torus_d4]
+file = "generated/torus_d4.csv"
+family = "torus"
+columns = "plain"
+size = "medium"
+generator = "torus"
+seed = 8
+parameters = { dimension = 4, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
+
+[cases.torus_d6]
+file = "generated/torus_d6.csv"
+family = "torus"
+columns = "plain"
+size = "medium"
+generator = "torus"
+seed = 9
+parameters = { dimension = 6, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
+
+[cases.torus_d8]
+file = "generated/torus_d8.csv"
+family = "torus"
+columns = "plain"
+size = "medium"
+generator = "torus"
+seed = 10
+parameters = { dimension = 8, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
+
+[cases.torus_d12]
+file = "generated/torus_d12.csv"
+family = "torus"
+columns = "plain"
+size = "medium"
+generator = "torus"
+seed = 11
+parameters = { dimension = 12, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
+
+[cases.torus_d16]
+file = "generated/torus_d16.csv"
+family = "torus"
+columns = "plain"
+size = "medium"
+generator = "torus"
+seed = 12
+parameters = { dimension = 16, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
+
+[cases.ball_d2_r2]
+file = "generated/ball_d2_r2.csv"
+family = "ball"
+columns = "plain"
+size = "small"
+generator = "ball"
+seed = 13
+parameters = { dimension = 2, radius = 2 }
+
+[cases.ball_d2_r4]
+file = "generated/ball_d2_r4.csv"
+family = "ball"
+columns = "plain"
+size = "small"
+generator = "ball"
+seed = 14
+parameters = { dimension = 2, radius = 4 }
+
+[cases.ball_d4_r2]
+file = "generated/ball_d4_r2.csv"
+family = "ball"
+columns = "plain"
+size = "small"
+generator = "ball"
+seed = 15
+parameters = { dimension = 4, radius = 2 }
+
+[cases.ball_d4_r4]
+file = "generated/ball_d4_r4.csv"
+family = "ball"
+columns = "plain"
+size = "medium"
+generator = "ball"
+seed = 16
+parameters = { dimension = 4, radius = 4 }
+
+[cases.ball_d6_r2]
+file = "generated/ball_d6_r2.csv"
+family = "ball"
+columns = "plain"
+size = "medium"
+generator = "ball"
+seed = 17
+parameters = { dimension = 6, radius = 2 }
+
+[cases.ball_d6_r4]
+file = "generated/ball_d6_r4.csv"
+family = "ball"
+columns = "plain"
+size = "large"
+generator = "ball"
+seed = 18
+parameters = { dimension = 6, radius = 4 }
+
+[cases.ball_d8_r2]
+file = "generated/ball_d8_r2.csv"
+family = "ball"
+columns = "plain"
+size = "large"
+generator = "ball"
+seed = 19
+parameters = { dimension = 8, radius = 2 }
+
+[cases.sphere_d3]
+file = "generated/sphere_d3.csv"
+family = "sphere"
+columns = "extent"
+size = "small"
+generator = "sphere"
+seed = 20
+parameters = { dimension = 3 }
+
+[cases.sphere_d4]
+file = "generated/sphere_d4.csv"
+family = "sphere"
+columns = "extent"
+size = "small"
+generator = "sphere"
+seed = 21
+parameters = { dimension = 4 }
+
+[cases.sphere_d5]
+file = "generated/sphere_d5.csv"
+family = "sphere"
+columns = "extent"
+size = "small"
+generator = "sphere"
+seed = 22
+parameters = { dimension = 5 }
+
+[cases.sphere_d6]
+file = "generated/sphere_d6.csv"
+family = "sphere"
+columns = "extent"
+size = "small"
+generator = "sphere"
+seed = 23
+parameters = { dimension = 6 }
+
+[cases.sphere_d7]
+file = "generated/sphere_d7.csv"
+family = "sphere"
+columns = "extent"
+size = "small"
+generator = "sphere"
+seed = 24
+parameters = { dimension = 7 }
+
+[cases.sphere_d8]
+file = "generated/sphere_d8.csv"
+family = "sphere"
+columns = "extent"
+size = "small"
+generator = "sphere"
+seed = 25
+parameters = { dimension = 8 }
+
+[cases.sphere_top_d3]
+file = "generated/sphere_top_d3.csv"
+family = "sphere"
+columns = "plain"
+size = "small"
+generator = "sphere_top"
+seed = 26
+parameters = { dimension = 3, side = 3 }
+
+[cases.sphere_top_d4]
+file = "generated/sphere_top_d4.csv"
+family = "sphere"
+columns = "plain"
+size = "small"
+generator = "sphere_top"
+seed = 27
+parameters = { dimension = 4, side = 3 }
+
+[cases.sphere_top_d6]
+file = "generated/sphere_top_d6.csv"
+family = "sphere"
+columns = "plain"
+size = "small"
+generator = "sphere_top"
+seed = 28
+parameters = { dimension = 6, side = 3 }
+
+[cases.sphere_top_d8]
+file = "generated/sphere_top_d8.csv"
+family = "sphere"
+columns = "plain"
+size = "medium"
+generator = "sphere_top"
+seed = 29
+parameters = { dimension = 8, side = 3 }
+
 [configs.full]
 backend = "sequential"
 threads = 1
