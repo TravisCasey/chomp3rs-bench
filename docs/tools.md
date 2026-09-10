@@ -31,7 +31,8 @@ version, and the limits the adapters enforce.
   a dense tool: it is skipped when the box would need more memory than the
   cap, at about 24 bytes per cell with 2^d cells per box position. Its output
   is the cells of a connection matrix, not bars; the adapter pairs them
-  itself.
+  itself. The box carries a value on top cubes only, so mixed-dimension cases
+  skip it.
 - Perseus materialises every face of every cube, 3^d cells per cube, so one
   cube alone needs about 1.4 KB times 3^d. It cannot run at ambient dimension
   16 under the suite's memory cap and is skipped there. It reads top cubes

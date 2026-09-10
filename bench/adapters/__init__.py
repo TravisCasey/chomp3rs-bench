@@ -38,13 +38,20 @@ run, under its `name`. A tool with a single configuration is handed the name
 its `columns`.
 
 `CASES_MOUNT` is where the container sees the repository's `cases`, read only,
-and `OUTPUT_MOUNT` is the run's own scratch directory, writable and empty at
-the start of every run.
+`OUTPUT_MOUNT` is the run's own scratch directory, writable and empty at the
+start of every run, and `SCRIPTS_MOUNT` is where it sees `scripts` beside this
+module, read only, holding the scripts through which a tool that is a Python
+module is called.
 """
 
 CASES_MOUNT = "/work/cases"
 OUTPUT_MOUNT = "/work/out"
+SCRIPTS_MOUNT = "/work/bench/adapters/scripts"
 
-from bench.adapters import chomp3rs, homcubes
+from bench.adapters import chomp3rs, homcubes, pychomp2
 
-ADAPTERS = {chomp3rs.NAME: chomp3rs, homcubes.NAME: homcubes}
+ADAPTERS = {
+    chomp3rs.NAME: chomp3rs,
+    homcubes.NAME: homcubes,
+    pychomp2.NAME: pychomp2,
+}

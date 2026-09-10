@@ -11,11 +11,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from bench import cases, machine, records
-from bench.adapters import ADAPTERS, CASES_MOUNT, OUTPUT_MOUNT
+from bench.adapters import ADAPTERS, CASES_MOUNT, OUTPUT_MOUNT, SCRIPTS_MOUNT
 from bench.manifest import expand
 from bench.wrapper import run_measured
 
 SCRATCH_DIRECTORY = Path("results/scratch")
+SCRIPTS_DIRECTORY = Path("bench/adapters/scripts")
 WORKING_DIRECTORY = "/work"
 
 
@@ -138,6 +139,7 @@ def measure(entry, repetition, converted, cases_directory, tier, described):
         threads=entry.config["threads"],
         mounts=[
             (cases_directory, CASES_MOUNT, "ro"),
+            (SCRIPTS_DIRECTORY, SCRIPTS_MOUNT, "ro"),
             (scratch, OUTPUT_MOUNT, "rw"),
         ],
         workdir=WORKING_DIRECTORY,
