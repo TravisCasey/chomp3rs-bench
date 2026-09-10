@@ -95,8 +95,8 @@ def plan(manifest, tier_name, only_tool, only_case, memory_limit_bytes):
         if only_case is not None and run.case != only_case:
             continue
         case = cases.load_case(run.case, manifest)
-        config = configuration(manifest, run)
         adapter = ADAPTERS.get(run.tool)
+        config = configuration(manifest, run, adapter)
         planned.append(
             Planned(
                 run=records.RecordedRun(
@@ -119,10 +119,12 @@ def plan(manifest, tier_name, only_tool, only_case, memory_limit_bytes):
     return planned
 
 
-def configuration(manifest, run):
-    """The configuration of a run: the name it goes by and the flags it sets."""
+def configuration(manifest, run, adapter):
+    """The configuration of a run: the name it goes by, the coefficient field the
+    tool answers over, and the flags it sets."""
     named = manifest.configs.get(run.config, {"threads": 1})
-    return {"name": run.config, **named}
+    coefficients = None if adapter is None else adapter.COEFFICIENTS
+    return {"name": run.config, "coefficients": coefficients, **named}
 
 
 def measure(entry, repetition, converted, cases_directory, tier, described):

@@ -45,6 +45,6 @@ the start of every run.
 CASES_MOUNT = "/work/cases"
 OUTPUT_MOUNT = "/work/out"
 
-from bench.adapters import chomp3rs
+from bench.adapters import chomp3rs, homcubes
 
-ADAPTERS = {chomp3rs.NAME: chomp3rs}
+ADAPTERS = {chomp3rs.NAME: chomp3rs, homcubes.NAME: homcubes}
