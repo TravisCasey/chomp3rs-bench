@@ -1,0 +1,79 @@
+{
+  "ambient_dimension": 16,
+  "bounding_box": [
+    [
+      -2,
+      -1
+    ],
+    [
+      -2,
+      0
+    ],
+    [
+      -2,
+      0
+    ],
+    [
+      -1,
+      1
+    ],
+    [
+      -1,
+      0
+    ],
+    [
+      -1,
+      1
+    ],
+    [
+      -1,
+      0
+    ],
+    [
+      -1,
+      0
+    ],
+    [
+      -3,
+      2
+    ],
+    [
+      -3,
+      2
+    ],
+    [
+      -4,
+      2
+    ],
+    [
+      -3,
+      2
+    ],
+    [
+      -3,
+      2
+    ],
+    [
+      -3,
+      2
+    ],
+    [
+      -3,
+      2
+    ],
+    [
+      -2,
+      1
+    ]
+  ],
+  "bounding_box_volume": 1693052928,
+  "cube_count": 310,
+  "family": "flows",
+  "grade_count": null,
+  "graded": false,
+  "mixed_dimension": false,
+  "source": {
+    "file": "flows/kuramoto_sivashinsky_d16_minimal.csv",
+    "kind": "committed"
+  }
+}

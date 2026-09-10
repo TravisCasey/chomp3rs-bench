@@ -1,1 +1,4 @@
 /tools/
+/.venv/
+__pycache__/
+/cases/generated/

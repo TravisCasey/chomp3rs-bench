@@ -1,0 +1,150 @@
+[cases.lorenz_d6_coarse]
+file = "flows/lorenz_d6_coarse.csv"
+family = "flows"
+columns = "plain"
+size = "small"
+
+[cases.lorenz_d6_fine]
+file = "flows/lorenz_d6_fine.csv"
+family = "flows"
+columns = "plain"
+size = "medium"
+
+[cases.dadras_d8_coarse]
+file = "flows/dadras_d8_coarse.csv"
+family = "flows"
+columns = "plain"
+size = "small"
+
+[cases.dadras_d8_fine]
+file = "flows/dadras_d8_fine.csv"
+family = "flows"
+columns = "plain"
+size = "medium"
+
+[cases."charney_devore_d12_box0.05"]
+file = "flows/charney_devore_d12_box0.05.csv"
+family = "flows"
+columns = "plain"
+size = "small"
+
+[cases."charney_devore_d12_box0.04"]
+file = "flows/charney_devore_d12_box0.04.csv"
+family = "flows"
+columns = "plain"
+size = "medium"
+
+[cases."charney_devore_d12_box0.03"]
+file = "flows/charney_devore_d12_box0.03.csv"
+family = "flows"
+columns = "plain"
+size = "medium"
+
+[cases."charney_devore_d12_box0.02"]
+file = "flows/charney_devore_d12_box0.02.csv"
+family = "flows"
+columns = "plain"
+size = "medium"
+
+[cases."charney_devore_d12_box0.01"]
+file = "flows/charney_devore_d12_box0.01.csv"
+family = "flows"
+columns = "plain"
+size = "large"
+
+[cases.kuramoto_sivashinsky_d16_minimal]
+file = "flows/kuramoto_sivashinsky_d16_minimal.csv"
+family = "flows"
+columns = "plain"
+size = "small"
+
+[cases.kuramoto_sivashinsky_d16_coarse]
+file = "flows/kuramoto_sivashinsky_d16_coarse.csv"
+family = "flows"
+columns = "plain"
+size = "medium"
+
+[cases.kuramoto_sivashinsky_d16_fine]
+file = "flows/kuramoto_sivashinsky_d16_fine.csv"
+family = "flows"
+columns = "plain"
+size = "medium"
+
+[configs.full]
+backend = "sequential"
+threads = 1
+modulus = 2
+
+[configs.production]
+max_critical_dimension = 2
+backend = "sequential"
+threads = 1
+modulus = 2
+check_dimensions = [0, 1]
+
+[configs.threads_2]
+backend = "rayon"
+threads = 2
+modulus = 2
+
+[configs.threads_4]
+backend = "rayon"
+threads = 4
+modulus = 2
+
+[configs.threads_8]
+backend = "rayon"
+threads = 8
+modulus = 2
+
+[configs.threads_16]
+backend = "rayon"
+threads = 16
+modulus = 2
+
+[tiers.smoke]
+cases = ["lorenz_d6_coarse", "kuramoto_sivashinsky_d16_minimal"]
+tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
+configs = ["full", "production"]
+repetitions = 1
+timeout_seconds = 60
+memory_limit_gigabytes = 24
+
+[tiers.quick]
+includes = ["smoke"]
+cases = ["dadras_d8_coarse", "charney_devore_d12_box0.05"]
+tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
+configs = ["full", "production"]
+repetitions = 3
+timeout_seconds = 300
+memory_limit_gigabytes = 24
+
+[tiers.nightly]
+includes = ["quick"]
+cases = [
+    "charney_devore_d12_box0.04",
+    "charney_devore_d12_box0.03",
+    "charney_devore_d12_box0.02",
+    "charney_devore_d12_box0.01",
+    "lorenz_d6_fine",
+    "dadras_d8_fine",
+]
+tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
+configs = ["full", "production"]
+repetitions = 3
+timeout_seconds = 1200
+memory_limit_gigabytes = 24
+
+[[tiers.nightly.studies]]
+name = "thread_scaling"
+configs = ["threads_2", "threads_4", "threads_8", "threads_16"]
+cases = ["lorenz_d6_fine", "dadras_d8_fine"]
+
+[tiers.full]
+includes = ["nightly"]
+cases = ["kuramoto_sivashinsky_d16_coarse", "kuramoto_sivashinsky_d16_fine"]
+tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
+configs = ["full", "production"]
+repetitions = 5
+timeout_seconds = 3600
+memory_limit_gigabytes = 24

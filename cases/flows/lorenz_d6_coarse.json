@@ -1,0 +1,39 @@
+{
+  "ambient_dimension": 6,
+  "bounding_box": [
+    [
+      -4,
+      3
+    ],
+    [
+      -6,
+      5
+    ],
+    [
+      0,
+      9
+    ],
+    [
+      -3,
+      2
+    ],
+    [
+      -4,
+      3
+    ],
+    [
+      -4,
+      3
+    ]
+  ],
+  "bounding_box_volume": 368640,
+  "cube_count": 788,
+  "family": "flows",
+  "grade_count": null,
+  "graded": false,
+  "mixed_dimension": false,
+  "source": {
+    "file": "flows/lorenz_d6_coarse.csv",
+    "kind": "committed"
+  }
+}

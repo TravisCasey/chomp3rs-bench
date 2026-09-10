@@ -1,0 +1,63 @@
+{
+  "ambient_dimension": 12,
+  "bounding_box": [
+    [
+      36,
+      48
+    ],
+    [
+      -8,
+      16
+    ],
+    [
+      -22,
+      4
+    ],
+    [
+      -37,
+      -10
+    ],
+    [
+      -23,
+      23
+    ],
+    [
+      -14,
+      28
+    ],
+    [
+      -1,
+      1
+    ],
+    [
+      -3,
+      2
+    ],
+    [
+      -2,
+      2
+    ],
+    [
+      -4,
+      2
+    ],
+    [
+      -4,
+      3
+    ],
+    [
+      -4,
+      3
+    ]
+  ],
+  "bounding_box_volume": 20021287104000,
+  "cube_count": 44798,
+  "family": "flows",
+  "grade_count": null,
+  "graded": false,
+  "mixed_dimension": false,
+  "source": {
+    "file": "flows/charney_devore_d12_box0.02.csv",
+    "kind": "committed"
+  }
+}
