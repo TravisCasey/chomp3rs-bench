@@ -27,6 +27,26 @@ The package installs one command, which is run as
 - `summarize` turns the measurements into tables.
 - `plot` turns them into figures.
 
+## Building the image
+
+Every tool the suite compares, and the driver that calls chomp3rs, is built once
+inside one container image, each at the revision the `Containerfile` pins. From
+the root of the repository:
+
+```
+podman build --network=host -t chomp3rs-bench .
+```
+
+The image records what it holds. To read the revision of every tool in it:
+
+```
+podman run --rm localhost/chomp3rs-bench cat /opt/tools/PINS
+```
+
+Each tool is on the image's `PATH` under `/opt/tools/bin`, the Python-hosted
+tools are reached through the interpreter `tools-python`, and the repository
+is mounted at `/work` when a case is run.
+
 ## License
 
 GPL-3.0-or-later. See `LICENSE`.

@@ -60,6 +60,11 @@ version, and the limits the adapters enforce.
 
 ## Build notes
 
+- homcubes builds every program from a `COMPILE` variable of its own and never
+  reads `CXXFLAGS`, so the container recipe sets that variable on the make
+  command line to compile it with the same flags as the other tools.
+- GUDHI is installed as a prebuilt wheel and is the one tool not compiled with
+  the image's flags.
 - Perseus does not compile under a current C++ standard library without three
   one-line changes marking constant members `const`; the container recipe
   applies them.
