@@ -4,8 +4,10 @@ A record lives at `results/runs/<tier>/<case>__<tool>__<config>__r<n>.json` and
 holds what was run, what it cost, what it measured and what produced it. The
 name is the identity of the run, so a record that is already there is a run
 already done: the run loop leaves it alone and an interrupted tier resumes
-where it stopped. Rerunning a run means deleting its record first; records are
-never edited.
+where it stopped. Rerunning a run means deleting its record first. The only
+change ever made to a record that is already written is the correctness check
+writing its `status`, which moves from `finished` to `disputed` when the record
+is part of a disagreement and back to `finished` when it is not.
 """
 
 import json
@@ -74,9 +76,12 @@ def heading(run, repetition, tool_version, config):
 
 
 def save(run, repetition, record):
+    return save_at(path_of(run, repetition), record)
+
+
+def save_at(path, record):
     """Write the record beside its name and move it on, so a half-written record
     never looks like a finished run."""
-    path = path_of(run, repetition)
     path.parent.mkdir(parents=True, exist_ok=True)
     partial = path.with_suffix(".json.part")
     partial.write_text(json.dumps(record, indent=2) + "\n")
@@ -84,6 +89,9 @@ def save(run, repetition, record):
     return path
 
 
-def read_all(tier):
-    directory = RUNS_DIRECTORY / tier
-    return [json.loads(path.read_text()) for path in sorted(directory.glob("*.json"))]
+def paths_in(tier, directory=RUNS_DIRECTORY):
+    return sorted((directory / tier).glob("*.json"))
+
+
+def read(path):
+    return json.loads(path.read_text())

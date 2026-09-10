@@ -364,7 +364,7 @@ threads = 16
 modulus = 2
 
 [tiers.smoke]
-cases = ["lorenz_d6_coarse", "kuramoto_sivashinsky_d16_minimal"]
+cases = ["lorenz_d6_coarse", "kuramoto_sivashinsky_d16_minimal", "s1_d4", "sphere_d4"]
 tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
 configs = ["full", "production"]
 repetitions = 1
