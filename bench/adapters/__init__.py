@@ -48,10 +48,11 @@ CASES_MOUNT = "/work/cases"
 OUTPUT_MOUNT = "/work/out"
 SCRIPTS_MOUNT = "/work/bench/adapters/scripts"
 
-from bench.adapters import chomp3rs, homcubes, pychomp2
+from bench.adapters import chomp3rs, homcubes, perseus, pychomp2
 
 ADAPTERS = {
     chomp3rs.NAME: chomp3rs,
     homcubes.NAME: homcubes,
+    perseus.NAME: perseus,
     pychomp2.NAME: pychomp2,
 }
