@@ -17,6 +17,12 @@ version, and the limits the adapters enforce.
 
 ## Limits the adapters enforce
 
+- chomp3rs is refused above ambient dimension 24. Its cube and orthant types
+  hold a fixed-size array of that many coordinates and its reader rejects a file
+  with more columns than that. The limit is there because the grade table the
+  library keeps for one orthant is dense in 2^d. It reads the canonical file
+  unchanged, grades and mixed-dimension cells included, so no case is skipped
+  for its format.
 - homcubes is refused above ambient dimension 19. Its reduction stage counts
   neighbours in a 32-bit integer that overflows at 3^20, and above that
   dimension it either fails to allocate or returns a wrong reduction while
