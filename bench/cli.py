@@ -63,7 +63,12 @@ def main():
 
 
 def run_generators(loaded, only, force):
-    for entry in loaded.cases.values():
+    """Run the generators, the cases that grade another case last so that the
+    case one of them names as its `base` has been written by the time it runs."""
+    ordered = sorted(
+        loaded.cases.values(), key=lambda entry: "base" in entry.parameters
+    )
+    for entry in ordered:
         if entry.generator is None or (only is not None and entry.name != only):
             continue
         written = entry.path.exists() and cases.sidecar_path(entry.path).exists()
@@ -71,9 +76,25 @@ def run_generators(loaded, only, force):
             continue
         entry.path.parent.mkdir(parents=True, exist_ok=True)
         generators.GENERATORS[entry.generator](
-            entry.name, entry.seed, entry.parameters, entry.path.parent
+            entry.name,
+            entry.seed,
+            resolved_parameters(loaded, entry),
+            entry.path.parent,
         )
         print(f"{entry.name} {entry.path}")
+
+
+def resolved_parameters(loaded, entry):
+    """The case's parameters, with the file and the layout of the case its
+    `base` names added where it has one."""
+    if "base" not in entry.parameters:
+        return entry.parameters
+    base = loaded.cases[entry.parameters["base"]]
+    return {
+        **entry.parameters,
+        "base_path": base.path,
+        "base_columns": base.columns,
+    }
 
 
 def write_missing_sidecars(loaded):

@@ -619,6 +619,123 @@ generator = "curve"
 seed = 61
 parameters = { dimension = 16, modes = 3, samples = 2000, tangent_bundle = true }
 
+[cases.s1_d4_sweep_g4]
+file = "generated/s1_d4_sweep_g4.csv"
+family = "s1"
+columns = "graded"
+size = "small"
+generator = "sweep"
+seed = 62
+parameters = { base = "s1_d4", axis = 0, grade_count = 4 }
+
+[cases.s1_d4_sweep_g16]
+file = "generated/s1_d4_sweep_g16.csv"
+family = "s1"
+columns = "graded"
+size = "small"
+generator = "sweep"
+seed = 63
+parameters = { base = "s1_d4", axis = 0, grade_count = 16 }
+
+[cases.s1_d4_sweep_g64]
+file = "generated/s1_d4_sweep_g64.csv"
+family = "s1"
+columns = "graded"
+size = "small"
+generator = "sweep"
+seed = 64
+parameters = { base = "s1_d4", axis = 0, grade_count = 64 }
+
+[cases.s1_d8_sweep_g16]
+file = "generated/s1_d8_sweep_g16.csv"
+family = "s1"
+columns = "graded"
+size = "small"
+generator = "sweep"
+seed = 65
+parameters = { base = "s1_d8", axis = 0, grade_count = 16 }
+
+[cases.torus_d6_sweep_g16]
+file = "generated/torus_d6_sweep_g16.csv"
+family = "torus"
+columns = "graded"
+size = "medium"
+generator = "sweep"
+seed = 66
+parameters = { base = "torus_d6", axis = 0, grade_count = 16 }
+
+[cases.curve_d8_n10000_sweep_g2]
+file = "generated/curve_d8_n10000_sweep_g2.csv"
+family = "curve"
+columns = "graded"
+size = "medium"
+generator = "sweep"
+seed = 67
+parameters = { base = "curve_d8_n10000", axis = 0, grade_count = 2 }
+
+[cases.curve_d8_n10000_sweep_g4]
+file = "generated/curve_d8_n10000_sweep_g4.csv"
+family = "curve"
+columns = "graded"
+size = "medium"
+generator = "sweep"
+seed = 68
+parameters = { base = "curve_d8_n10000", axis = 0, grade_count = 4 }
+
+[cases.curve_d8_n10000_sweep_g8]
+file = "generated/curve_d8_n10000_sweep_g8.csv"
+family = "curve"
+columns = "graded"
+size = "medium"
+generator = "sweep"
+seed = 69
+parameters = { base = "curve_d8_n10000", axis = 0, grade_count = 8 }
+
+[cases.curve_d8_n10000_sweep_g16]
+file = "generated/curve_d8_n10000_sweep_g16.csv"
+family = "curve"
+columns = "graded"
+size = "medium"
+generator = "sweep"
+seed = 70
+parameters = { base = "curve_d8_n10000", axis = 0, grade_count = 16 }
+
+[cases.curve_d8_n10000_sweep_g32]
+file = "generated/curve_d8_n10000_sweep_g32.csv"
+family = "curve"
+columns = "graded"
+size = "medium"
+generator = "sweep"
+seed = 71
+parameters = { base = "curve_d8_n10000", axis = 0, grade_count = 32 }
+
+[cases.curve_d8_n10000_sweep_g64]
+file = "generated/curve_d8_n10000_sweep_g64.csv"
+family = "curve"
+columns = "graded"
+size = "medium"
+generator = "sweep"
+seed = 72
+parameters = { base = "curve_d8_n10000", axis = 0, grade_count = 64 }
+
+[cases."random_top_d4_p0.5_random_g8"]
+file = "generated/random_top_d4_p0.5_random_g8.csv"
+family = "random_top"
+columns = "graded"
+size = "small"
+generator = "random_grades"
+seed = 73
+parameters = { base = "random_top_d4_p0.5", grade_count = 8 }
+
+[cases.lorenz_d6_coarse_random_g8]
+file = "generated/lorenz_d6_coarse_random_g8.csv"
+family = "flows"
+columns = "graded"
+size = "small"
+generator = "random_grades"
+seed = 74
+parameters = { base = "lorenz_d6_coarse", grade_count = 8 }
+
 [configs.full]
 backend = "sequential"
 threads = 1
@@ -661,6 +778,7 @@ cases = [
     "random_top_d4_p0.5",
     "random_mixed_d4_n500",
     "curve_d4_n2000",
+    "s1_d4_sweep_g4",
 ]
 tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
 configs = ["full", "production"]
