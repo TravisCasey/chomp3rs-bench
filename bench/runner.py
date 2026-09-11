@@ -188,13 +188,20 @@ def standing(entry):
 
 
 def convert_tier(manifest, tier_name, *, only_tool=None):
+    """Convert each case once per tool, leaving alone the case a tool would
+    skip: a dense tool's grid for a case above its cap is as far out of reach
+    here as it is in the run."""
     tier = manifest.tiers[tier_name]
-    for name in tier.cases:
-        case = cases.load_case(name, manifest)
-        for tool, adapter in ADAPTERS.items():
-            if only_tool is not None and tool != only_tool:
-                continue
-            print(f"{name} {tool} {adapter.convert(case)}")
+    seen = set()
+    for entry in plan(manifest, tier_name, only_tool, None, memory_cap(tier)):
+        key = (entry.run.case, entry.run.tool)
+        if entry.adapter is None or key in seen:
+            continue
+        seen.add(key)
+        if entry.skip_reason is not None:
+            print(f"{entry.run.case} {entry.run.tool} skipped {entry.skip_reason}")
+            continue
+        print(f"{entry.run.case} {entry.run.tool} {entry.adapter.convert(entry.case)}")
 
 
 def label(entry, repetition):
