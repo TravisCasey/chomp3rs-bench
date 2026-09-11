@@ -331,6 +331,294 @@ generator = "sphere_top"
 seed = 29
 parameters = { dimension = 8, side = 3 }
 
+[cases."random_top_d3_p0.3"]
+file = "generated/random_top_d3_p0.3.csv"
+family = "random_top"
+columns = "plain"
+size = "small"
+generator = "random_top"
+seed = 30
+parameters = { dimension = 3, side = 16, probability = 0.3 }
+
+[cases."random_top_d3_p0.5"]
+file = "generated/random_top_d3_p0.5.csv"
+family = "random_top"
+columns = "plain"
+size = "small"
+generator = "random_top"
+seed = 31
+parameters = { dimension = 3, side = 16, probability = 0.5 }
+
+[cases."random_top_d3_p0.7"]
+file = "generated/random_top_d3_p0.7.csv"
+family = "random_top"
+columns = "plain"
+size = "small"
+generator = "random_top"
+seed = 32
+parameters = { dimension = 3, side = 16, probability = 0.7 }
+
+[cases."random_top_d4_p0.3"]
+file = "generated/random_top_d4_p0.3.csv"
+family = "random_top"
+columns = "plain"
+size = "small"
+generator = "random_top"
+seed = 33
+parameters = { dimension = 4, side = 8, probability = 0.3 }
+
+[cases."random_top_d4_p0.5"]
+file = "generated/random_top_d4_p0.5.csv"
+family = "random_top"
+columns = "plain"
+size = "small"
+generator = "random_top"
+seed = 34
+parameters = { dimension = 4, side = 8, probability = 0.5 }
+
+[cases."random_top_d4_p0.7"]
+file = "generated/random_top_d4_p0.7.csv"
+family = "random_top"
+columns = "plain"
+size = "small"
+generator = "random_top"
+seed = 35
+parameters = { dimension = 4, side = 8, probability = 0.7 }
+
+[cases."random_top_d6_p0.3"]
+file = "generated/random_top_d6_p0.3.csv"
+family = "random_top"
+columns = "plain"
+size = "small"
+generator = "random_top"
+seed = 36
+parameters = { dimension = 6, side = 5, probability = 0.3 }
+
+[cases."random_top_d6_p0.5"]
+file = "generated/random_top_d6_p0.5.csv"
+family = "random_top"
+columns = "plain"
+size = "medium"
+generator = "random_top"
+seed = 37
+parameters = { dimension = 6, side = 5, probability = 0.5 }
+
+[cases."random_top_d6_p0.7"]
+file = "generated/random_top_d6_p0.7.csv"
+family = "random_top"
+columns = "plain"
+size = "medium"
+generator = "random_top"
+seed = 38
+parameters = { dimension = 6, side = 5, probability = 0.7 }
+
+[cases."random_top_d8_p0.3"]
+file = "generated/random_top_d8_p0.3.csv"
+family = "random_top"
+columns = "plain"
+size = "medium"
+generator = "random_top"
+seed = 39
+parameters = { dimension = 8, side = 4, probability = 0.3 }
+
+[cases."random_top_d8_p0.5"]
+file = "generated/random_top_d8_p0.5.csv"
+family = "random_top"
+columns = "plain"
+size = "medium"
+generator = "random_top"
+seed = 40
+parameters = { dimension = 8, side = 4, probability = 0.5 }
+
+[cases."random_top_d8_p0.7"]
+file = "generated/random_top_d8_p0.7.csv"
+family = "random_top"
+columns = "plain"
+size = "medium"
+generator = "random_top"
+seed = 41
+parameters = { dimension = 8, side = 4, probability = 0.7 }
+
+[cases.random_mixed_d4_n500]
+file = "generated/random_mixed_d4_n500.csv"
+family = "random_mixed"
+columns = "extent"
+size = "small"
+generator = "random_mixed"
+seed = 42
+parameters = { dimension = 4, side = 8, count = 500, minimum_cube_dimension = 1, maximum_cube_dimension = 4 }
+
+[cases.random_mixed_d4_n2000]
+file = "generated/random_mixed_d4_n2000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "small"
+generator = "random_mixed"
+seed = 43
+parameters = { dimension = 4, side = 8, count = 2000, minimum_cube_dimension = 1, maximum_cube_dimension = 4 }
+
+[cases.random_mixed_d6_n500]
+file = "generated/random_mixed_d6_n500.csv"
+family = "random_mixed"
+columns = "extent"
+size = "small"
+generator = "random_mixed"
+seed = 44
+parameters = { dimension = 6, side = 5, count = 500, minimum_cube_dimension = 1, maximum_cube_dimension = 6 }
+
+[cases.random_mixed_d6_n2000]
+file = "generated/random_mixed_d6_n2000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "small"
+generator = "random_mixed"
+seed = 45
+parameters = { dimension = 6, side = 5, count = 2000, minimum_cube_dimension = 1, maximum_cube_dimension = 6 }
+
+[cases.random_mixed_d8_n500]
+file = "generated/random_mixed_d8_n500.csv"
+family = "random_mixed"
+columns = "extent"
+size = "small"
+generator = "random_mixed"
+seed = 46
+parameters = { dimension = 8, side = 4, count = 500, minimum_cube_dimension = 1, maximum_cube_dimension = 8 }
+
+[cases.random_mixed_d8_n2000]
+file = "generated/random_mixed_d8_n2000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "small"
+generator = "random_mixed"
+seed = 47
+parameters = { dimension = 8, side = 4, count = 2000, minimum_cube_dimension = 1, maximum_cube_dimension = 8 }
+
+[cases.curve_d4_n2000]
+file = "generated/curve_d4_n2000.csv"
+family = "curve"
+columns = "plain"
+size = "small"
+generator = "curve"
+seed = 48
+parameters = { dimension = 4, modes = 3, samples = 2000, tangent_bundle = false }
+
+[cases.curve_d4_n10000]
+file = "generated/curve_d4_n10000.csv"
+family = "curve"
+columns = "plain"
+size = "medium"
+generator = "curve"
+seed = 49
+parameters = { dimension = 4, modes = 3, samples = 10000, tangent_bundle = false }
+
+[cases.curve_d6_n2000]
+file = "generated/curve_d6_n2000.csv"
+family = "curve"
+columns = "plain"
+size = "small"
+generator = "curve"
+seed = 50
+parameters = { dimension = 6, modes = 3, samples = 2000, tangent_bundle = false }
+
+[cases.curve_d6_n10000]
+file = "generated/curve_d6_n10000.csv"
+family = "curve"
+columns = "plain"
+size = "medium"
+generator = "curve"
+seed = 51
+parameters = { dimension = 6, modes = 3, samples = 10000, tangent_bundle = false }
+
+[cases.curve_d8_n2000]
+file = "generated/curve_d8_n2000.csv"
+family = "curve"
+columns = "plain"
+size = "small"
+generator = "curve"
+seed = 52
+parameters = { dimension = 8, modes = 3, samples = 2000, tangent_bundle = false }
+
+[cases.curve_d8_n10000]
+file = "generated/curve_d8_n10000.csv"
+family = "curve"
+columns = "plain"
+size = "medium"
+generator = "curve"
+seed = 53
+parameters = { dimension = 8, modes = 3, samples = 10000, tangent_bundle = false }
+
+[cases.curve_d12_n2000]
+file = "generated/curve_d12_n2000.csv"
+family = "curve"
+columns = "plain"
+size = "small"
+generator = "curve"
+seed = 54
+parameters = { dimension = 12, modes = 3, samples = 2000, tangent_bundle = false }
+
+[cases.curve_d12_n10000]
+file = "generated/curve_d12_n10000.csv"
+family = "curve"
+columns = "plain"
+size = "medium"
+generator = "curve"
+seed = 55
+parameters = { dimension = 12, modes = 3, samples = 10000, tangent_bundle = false }
+
+[cases.curve_d16_n2000]
+file = "generated/curve_d16_n2000.csv"
+family = "curve"
+columns = "plain"
+size = "small"
+generator = "curve"
+seed = 56
+parameters = { dimension = 16, modes = 3, samples = 2000, tangent_bundle = false }
+
+[cases.curve_d16_n10000]
+file = "generated/curve_d16_n10000.csv"
+family = "curve"
+columns = "plain"
+size = "medium"
+generator = "curve"
+seed = 57
+parameters = { dimension = 16, modes = 3, samples = 10000, tangent_bundle = false }
+
+[cases.curve_tb_d6]
+file = "generated/curve_tb_d6.csv"
+family = "curve"
+columns = "plain"
+size = "small"
+generator = "curve"
+seed = 58
+parameters = { dimension = 6, modes = 3, samples = 2000, tangent_bundle = true }
+
+[cases.curve_tb_d8]
+file = "generated/curve_tb_d8.csv"
+family = "curve"
+columns = "plain"
+size = "small"
+generator = "curve"
+seed = 59
+parameters = { dimension = 8, modes = 3, samples = 2000, tangent_bundle = true }
+
+[cases.curve_tb_d12]
+file = "generated/curve_tb_d12.csv"
+family = "curve"
+columns = "plain"
+size = "small"
+generator = "curve"
+seed = 60
+parameters = { dimension = 12, modes = 3, samples = 2000, tangent_bundle = true }
+
+[cases.curve_tb_d16]
+file = "generated/curve_tb_d16.csv"
+family = "curve"
+columns = "plain"
+size = "small"
+generator = "curve"
+seed = 61
+parameters = { dimension = 16, modes = 3, samples = 2000, tangent_bundle = true }
+
 [configs.full]
 backend = "sequential"
 threads = 1
@@ -370,6 +658,9 @@ cases = [
     "s1_d4",
     "sphere_d4",
     "sphere_top_d3",
+    "random_top_d4_p0.5",
+    "random_mixed_d4_n500",
+    "curve_d4_n2000",
 ]
 tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
 configs = ["full", "production"]
