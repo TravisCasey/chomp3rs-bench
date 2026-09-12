@@ -5,14 +5,15 @@ of every case that has none; `convert`, `run`, `check`, `summarize` and `plot`
 each take a tier name and act on the runs that tier asks for. `convert` and
 `run` narrow to one tool with `--tool`, `run` narrows to one case with `--case`,
 and `--dry-run` prints what `run` would do and what it would cost at worst
-without running anything. `check` reads the records under `--runs-directory`,
-`results/runs` by default, and exits 1 when it finds a record it disputes.
+without running anything. `check` and `summarize` read the records under
+`--runs-directory`, `results/runs` by default, and `check` exits 1 when it finds
+a record it disputes.
 """
 
 import argparse
 from pathlib import Path
 
-from bench import cases, check, generators, manifest, records, runner
+from bench import cases, check, generators, manifest, records, runner, summarize
 
 DEFAULT_MANIFEST = Path("cases/manifest.toml")
 TIER_SUBCOMMANDS = ("convert", "run", "check", "summarize", "plot")
@@ -38,6 +39,9 @@ def main():
     tier_parsers["check"].add_argument(
         "--runs-directory", type=Path, default=records.RUNS_DIRECTORY
     )
+    tier_parsers["summarize"].add_argument(
+        "--runs-directory", type=Path, default=records.RUNS_DIRECTORY
+    )
     arguments = parser.parse_args()
     loaded = manifest.load(arguments.manifest)
     if arguments.subcommand == "generate":
@@ -58,6 +62,8 @@ def main():
         check.print_report(report)
         if report.disputed:
             raise SystemExit(1)
+    elif arguments.subcommand == "summarize":
+        summarize.summarize_tier(loaded, arguments.tier, arguments.runs_directory)
     else:
         print_runs(loaded, arguments.tier)
 
