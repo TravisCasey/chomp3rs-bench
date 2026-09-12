@@ -5,6 +5,7 @@ description = "Benchmark comparison suite for the chomp3rs cubical homology crat
 requires-python = ">=3.12"
 license = "GPL-3.0-or-later"
 dependencies = [
+    "matplotlib>=3.11.2",
     "numpy>=2.5.3",
 ]
 

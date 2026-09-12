@@ -7,13 +7,14 @@ each take a tier name and act on the runs that tier asks for. `convert` and
 and `--dry-run` prints what `run` would do and what it would cost at worst
 without running anything. `check` and `summarize` read the records under
 `--runs-directory`, `results/runs` by default, and `check` exits 1 when it finds
-a record it disputes.
+a record it disputes. `plot` reads the tables `summarize` wrote and draws the
+figures under `figures/<tier>/`.
 """
 
 import argparse
 from pathlib import Path
 
-from bench import cases, check, generators, manifest, records, runner, summarize
+from bench import cases, check, generators, manifest, plot, records, runner, summarize
 
 DEFAULT_MANIFEST = Path("cases/manifest.toml")
 TIER_SUBCOMMANDS = ("convert", "run", "check", "summarize", "plot")
@@ -65,7 +66,7 @@ def main():
     elif arguments.subcommand == "summarize":
         summarize.summarize_tier(loaded, arguments.tier, arguments.runs_directory)
     else:
-        print_runs(loaded, arguments.tier)
+        plot.plot_tier(loaded, arguments.tier)
 
 
 def run_generators(loaded, only, force):
@@ -116,10 +117,3 @@ def write_missing_sidecars(loaded):
             source={"kind": "committed", "file": entry.file},
         )
         print(f"{entry.name} {path}")
-
-
-def print_runs(loaded, tier_name):
-    runs = manifest.expand(loaded, tier_name)
-    for run in runs:
-        print(f"{run.case} {run.tool} {run.config}")
-    print(f"{len(runs)} runs")
