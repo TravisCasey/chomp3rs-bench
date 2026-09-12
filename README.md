@@ -10,9 +10,23 @@ turns the results into tables and figures.
 
 ## Layout
 
-`bench/` is the Python package that drives everything, `cases/` holds the
-benchmark inputs and the manifest that lists them, and `docs/` holds the notes
-on the tools being compared.
+- `bench/` is the Python package that drives everything: the generators that
+  write cases, the converters that put a case in a tool's input format, one
+  adapter per tool, the measurement wrapper, the correctness check, the tables
+  and the figures.
+- `driver/` is the Rust program that calls the chomp3rs API and prints its
+  answer, its stage timings and its cell counts as JSON. It is the only Rust in
+  the repository.
+- `cases/` holds the benchmark inputs and `cases/manifest.toml`, which lists
+  every case, every tool configuration and every tier.
+- `Containerfile` builds the one image that holds every tool compared and the
+  driver, each at a pinned revision.
+- `results/` holds one JSON record per measured run under `results/runs/` and
+  the summary tables under `results/summary/`.
+- `figures/` holds the figures, one directory per tier, and under
+  `figures/reference/` the published timings one figure draws beside them.
+- `docs/` holds `docs/tools.md`, the record of where each tool came from, which
+  version is built, and the limits its adapter enforces.
 
 The package installs one command, which is run as
 `uv run bench <subcommand> [tier]`, where the tier is `smoke`, `quick`,
@@ -26,6 +40,23 @@ The package installs one command, which is run as
 - `check` compares the answers the tools gave.
 - `summarize` turns the measurements into tables.
 - `plot` turns them into figures.
+
+## Prerequisites
+
+- A Linux host with rootless Podman. The measurements here were taken with
+  Podman's `crun` runtime; `krun` runs a container inside a virtual machine and
+  is not suitable for timing one. Every measured run starts a container with
+  `--network=none`; only the image build needs `--network=host`.
+- `uv`, which manages the Python side and installs the `bench` command.
+- Network access for the image build and for the first `bench generate`, which
+  downloads about 320 MB of published volumes.
+
+The numbers below were measured on a machine with 16 cores and 32 GB of memory,
+and every tier requests a 24 GB cap, which assumes a machine of about that size.
+The cap is a tier's `memory_limit_gigabytes` in `cases/manifest.toml`; set a
+smaller one there for a smaller machine. That number is also the boundary at
+which a tool needing a dense grid is skipped, so a smaller machine measures a
+smaller comparison and not merely the same one under a tighter cap.
 
 ## Building the image
 
@@ -46,6 +77,47 @@ podman run --rm localhost/chomp3rs-bench cat /opt/tools/PINS
 Each tool is on the image's `PATH` under `/opt/tools/bin`, the Python-hosted
 tools are reached through the interpreter `tools-python`, and the repository
 is mounted at `/work` when a case is run.
+
+## The tools compared
+
+`docs/tools.md` records, for each tool, where its source came from, which
+version the image builds, its licence, the coefficient fields it offers, and the
+limits its adapter enforces with the reason for each.
+
+chomp3rs itself is measured in two configurations. `full` keeps every dimension
+and is the one every figure that compares tools uses. `production` caps the
+critical dimension at 2 and appears as a second labelled row, whose answer is
+compared only in dimensions 0 and 1, the dimensions that cap leaves meaningful.
+
+## Preparing the inputs
+
+Install the Python side and the `bench` command:
+
+```
+uv sync
+```
+
+Every `bench` command below is run from the root of the repository, because the
+manifest, the cases and the results are named relative to it.
+
+Then write the inputs:
+
+```
+uv run bench generate
+```
+
+`generate` runs the generator of every case whose file is missing, downloads the
+published volumes, and writes the sidecar of every case that has none, printing
+one line per file it writes. Repeating it costs nothing: a case whose file and
+sidecar are both there is passed over, so a second run prints nothing at all.
+`--force` rewrites a case anyway, and `--only <case>` restricts the command to
+one case.
+
+Each tool reads its own input format. To write those before measuring:
+
+```
+uv run bench convert smoke
+```
 
 ## Running
 
@@ -106,6 +178,121 @@ timeout.
 | `quick` | 291 | 368 | 73 hours |
 | `nightly` | 548 | 788 | 548 hours |
 | `full` | 592 | 892 | 2960 hours |
+
+## Checking the answers
+
+```
+uv run bench check smoke
+```
+
+`check` takes one of two paths per case. A case whose sidecar carries a closed
+form is compared against it, however many tools answered; one answering tool is
+enough. A case without one is decided tool against tool, and counts as checked
+only where two or more tools answered it and agreed; with a single tool behind
+it, it is reported as unchecked, which is not a failure.
+
+`check` changes one field of a record and nothing else: a record that is part of
+a disagreement has its `status` written as `disputed`, and a record that is not
+part of one has it written back to `finished`. It exits non-zero when any record
+is disputed.
+
+## Summary tables
+
+```
+uv run bench summarize smoke
+```
+
+writes two tables under `results/summary/<tier>/`.
+
+`runs.csv` has one row per case, tool and configuration, under these columns:
+the case with `case`, `family`, `ambient_dimension`, `cube_count`,
+`bounding_box_volume`, `graded` and `grade_count`; the tool with `tool` and
+`tool_version`; the configuration with `config`, `threads` and `modulus`; the
+outcome with `status`, `repetitions` and `statuses`; the cost with
+`wall_median`, `wall_min`, `wall_max`, `user_median`, `system_median`,
+`peak_rss_median_kb` and `peak_rss_max_kb`; `answer` as a JSON list; `image_id`
+and `repository_commit` for what produced it; and `skip_reason` on a skipped
+row. The chomp3rs `production` row carries its answer in dimensions 0 and 1
+only.
+
+`stages.csv` has one row per stage of each chomp3rs run: the case, the
+configuration, the stage, its median seconds, and the cells going in and coming
+out.
+
+A repetition the tier stopped still counts towards its row, censored at the
+limit it hit rather than at the number the kill left behind: one stopped for
+time carries the tier's timeout as its wall time, one stopped for memory carries
+the cap as its peak. A group whose repetitions ended differently keeps its
+measured medians, takes the worst of their statuses, and lists the mix in its
+`statuses` column.
+
+## Figures
+
+```
+uv run bench plot smoke
+```
+
+writes `figures/<tier>/fig<NN>_<name>.pdf` and `.png`. The ten figures are, in
+order, `headline_flows`, `ladder_d12`, `dimension_manifolds`, `sphere_table1`,
+`density_random_top`, `mixed_dimension`, `grade_count`, `thread_scaling`,
+`memory_volume` and `published_sets`. A figure whose cases or tools the tier's
+tables do not hold is not drawn, and one line says what was missing, so a
+smaller tier yields a subset of the ten.
+
+A run the tier stopped is drawn where it stopped. A run out of time is an open
+marker at the tier's timeout; a run killed for memory is a cross, at the wall
+time it reached on a time axis and at the cap on a memory axis; a wall time
+below the timer's 0.01 second resolution is an open marker at that floor; and an
+answer the check disputed is drawn inside a black ring. A run out of time has no
+peak to draw and is absent from a memory axis, and a run that ended in an error
+is not drawn at all but is named in a printed line. Every figure's legend names
+the conventions that figure uses.
+
+Figure 4 draws `figures/reference/table1.csv`, a transcription of Table 1(a) of
+arXiv 2105.09870, beside the suite's own sphere cases.
+
+## Reading a result record
+
+One run of one tool on one case is one file:
+
+```
+results/runs/<tier>/<case>__<tool>__<config>__r<repetition>.json
+```
+
+It holds the case and its family; the tool and its version; the configuration,
+which is its name, its coefficient field and its thread count, and for chomp3rs
+the backend, the modulus, the maximum critical dimension where one is set, and
+on the `production` configuration the `check_dimensions` its answer is compared
+on; the tier and the repetition; the wall, user and system seconds and the peak
+resident set size in kilobytes; the status; the answer, which is the Betti
+numbers and, on the persistence track, the bar counts, with the finite and
+essential bars beside them on a chomp3rs record; the driver's six stages
+with their seconds and cell counts, on chomp3rs records only; and the machine,
+which is its hostname, processor model, kernel, image identifier and repository
+commit. A run a tool declared it cannot do is a record with repetition 0, no
+measurements and a `skip_reason`.
+
+The wrapper runs each tool under `timeout -s KILL` and `/usr/bin/time -v` inside
+a container capped with `--memory`, and reads how the run ended out of the two.
+The status is one of six:
+
+- `finished`: the run ended normally.
+- `disputed`: it ended normally and `check` found its answer in a disagreement.
+- `timeout`: it passed the tier's timeout and was killed. The wall time is the
+  wrapper's own clock, and there are no user, system or peak figures, because
+  the kill takes `time` with it.
+- `out_of_memory`: the cap killed it. Its measured wall time is kept and its
+  peak is the cap.
+- `error`: any other nonzero exit.
+- `skipped`: the tool declared it could not do the run.
+
+## Rerunning a case
+
+A record that is already there is a run already done, which is what lets an
+interrupted tier resume: the run loop passes over it and never measures it
+again. To measure a case again, delete its records under `results/runs/<tier>/`
+and run the tier again. Result files are not edited by hand; a wrong result is
+deleted and measured again.
 
 ## Published image volumes
 
@@ -180,6 +367,21 @@ German Research Council (DFG); Marschner-Lobb to Marschner and Lobb; Engine to
 General Electric; Aneurysm and Foot to Philips Research, Hamburg; Bonsai to S.
 Roettger, VIS, University of Stuttgart; vertebra to Michael Meissner,
 Viatronix Inc. The collection names no source for Tooth.
+
+## Deferred comparisons
+
+Two comparisons the suite is built for and does not yet run.
+
+**The lift comparison.** chomp3rs and pyCHomP2 both lift a homology class back
+to a cycle and a cocycle of the original complex, which the Betti numbers alone
+do not give. Timing both lifts on the H^1 bars of the flow covers attaches as a
+flag on the driver and a second pyCHomP2 configuration.
+
+**The MPI study.** DIPHA distributes its matrix reduction across MPI ranks and
+chomp3rs has an MPI feature of its own. Measuring both at 1, 2, 4, 8 and 16
+ranks says how each of them scales with the ranks it is given. It attaches as a
+tier with a rank axis and a wrapper that submits a job instead of starting a
+single container.
 
 ## License
 
