@@ -10,10 +10,12 @@ The run passes `-p 2`, which computes over the field of integers modulo 2, and
 `-b`, which provides a file holding one Betti number per line starting at
 dimension 0. That file has one line per ambient dimension, so it stops one
 dimension below the ambient dimension and the answer is as long as the file.
-Above ambient dimension 19 the reduction stage counts neighbours in a 32-bit
-integer that overflows at 3^20 and can return a wrong reduction while appearing
-to succeed, so the tool is refused there. It reads no grade, birth or other
-filtration value, so graded cases are skipped.
+The tool is refused at ambient dimension 12 and above: on every case measured
+there (the five flow covers of dimension 12, a circle, a torus and a thickened
+curve) it ran past a 20 minute timeout under a 24 GB cap, while cases of
+dimension 8 finish in minutes, and above dimension 19 its reduction stage would
+in any event count neighbours in a 32-bit integer that overflows at 3^20. It
+reads no grade, birth or other filtration value, so graded cases are skipped.
 """
 
 from pathlib import Path
@@ -24,7 +26,7 @@ from bench.adapters import CASES_MOUNT, OUTPUT_MOUNT
 NAME = "homcubes"
 TRACKS = {"homology"}
 ACCEPTS_MIXED_DIMENSION = True
-MAXIMUM_DIMENSION = 19
+MAXIMUM_DIMENSION = 11
 COEFFICIENTS = "Z/2"
 BYTES_PER_CELL = None
 CONSTRUCTION = None

@@ -23,10 +23,14 @@ version, and the limits the adapters enforce.
   library keeps for one orthant is dense in 2^d. It reads the canonical file
   unchanged, grades and mixed-dimension cells included, so no case is skipped
   for its format.
-- homcubes is refused above ambient dimension 19. Its reduction stage counts
-  neighbours in a 32-bit integer that overflows at 3^20, and above that
-  dimension it either fails to allocate or returns a wrong reduction while
-  appearing to succeed. It has no filtration track, so graded cases skip it.
+- homcubes is refused at ambient dimension 12 and above. On every case
+  measured there, the five flow covers of dimension 12, a circle, a torus and
+  a thickened curve, it ran past a 20 minute timeout under a 24 GB cap, while
+  every case of dimension 8 finished within minutes; the closure of one cube
+  has 3^d faces, and the tool builds them all. Above dimension 19 its
+  reduction stage would in any event count neighbours in a 32-bit integer that
+  overflows at 3^20 and could return a wrong reduction while appearing to
+  succeed. It has no filtration track, so graded cases skip it.
 - pyCHomP2 takes only a box with a value per cell, never a cube list, so it is
   a dense tool: it is skipped when the box would need more memory than the
   cap, at about 24 bytes per cell with 2^d cells per box position. Its output

@@ -969,8 +969,9 @@ modulus = 2
 [tiers.smoke]
 cases = [
     "lorenz_d6_coarse",
-    "kuramoto_sivashinsky_d16_minimal",
     "s1_d4",
+    "torus_d3",
+    "ball_d4_r2",
     "sphere_d4",
     "sphere_top_d3",
     "random_top_d4_p0.5",
@@ -987,7 +988,43 @@ memory_limit_gigabytes = 24
 
 [tiers.quick]
 includes = ["smoke"]
-cases = ["dadras_d8_coarse", "charney_devore_d12_box0.05"]
+cases = [
+    "dadras_d8_coarse",
+    "s1_d2",
+    "s1_d6",
+    "ball_d2_r2",
+    "ball_d2_r4",
+    "sphere_d3",
+    "sphere_d5",
+    "sphere_d6",
+    "sphere_d7",
+    "sphere_top_d4",
+    "sphere_top_d6",
+    "curve_d6_n2000",
+    "curve_tb_d6",
+    "random_top_d3_p0.3",
+    "random_top_d3_p0.5",
+    "random_top_d3_p0.7",
+    "random_top_d4_p0.3",
+    "random_top_d4_p0.7",
+    "random_mixed_d4_n2000",
+    "random_mixed_d8_n500",
+    "random_mixed_d8_n2000",
+    "s1_d4_sweep_g16",
+    "s1_d4_sweep_g64",
+    "random_top_d4_p0.5_random_g8",
+    "lorenz_d6_coarse_random_g8",
+    "silicium_downsample2",
+    "fuel_downsample2",
+    "neghip_downsample2",
+    "hydrogen_atom_downsample2",
+    "engine_downsample2",
+    "tooth_downsample2",
+    "aneurism_downsample2",
+    "bonsai_downsample2",
+    "foot_downsample2",
+    "vertebra_downsample8",
+]
 tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
 configs = ["full", "production"]
 repetitions = 3
@@ -997,12 +1034,55 @@ memory_limit_gigabytes = 24
 [tiers.nightly]
 includes = ["quick"]
 cases = [
+    "charney_devore_d12_box0.05",
     "charney_devore_d12_box0.04",
     "charney_devore_d12_box0.03",
     "charney_devore_d12_box0.02",
     "charney_devore_d12_box0.01",
     "lorenz_d6_fine",
     "dadras_d8_fine",
+    "s1_d8",
+    "s1_d12",
+    "torus_d4",
+    "torus_d6",
+    "torus_d8",
+    "torus_d12",
+    "ball_d4_r4",
+    "ball_d6_r2",
+    "sphere_d8",
+    "sphere_top_d8",
+    "curve_d8_n2000",
+    "curve_tb_d8",
+    "curve_d4_n10000",
+    "curve_d6_n10000",
+    "curve_d8_n10000",
+    "curve_d12_n2000",
+    "curve_d12_n10000",
+    "curve_tb_d12",
+    "random_top_d6_p0.3",
+    "random_top_d6_p0.5",
+    "random_top_d6_p0.7",
+    "random_mixed_d6_n500",
+    "random_mixed_d6_n2000",
+    "s1_d8_sweep_g16",
+    "torus_d6_sweep_g16",
+    "curve_d8_n10000_sweep_g2",
+    "curve_d8_n10000_sweep_g4",
+    "curve_d8_n10000_sweep_g8",
+    "curve_d8_n10000_sweep_g16",
+    "curve_d8_n10000_sweep_g32",
+    "curve_d8_n10000_sweep_g64",
+    "silicium_full",
+    "fuel_full",
+    "marschner_lobb_full",
+    "neghip_full",
+    "hydrogen_atom_full",
+    "engine_full",
+    "tooth_full",
+    "aneurism_full",
+    "bonsai_full",
+    "foot_full",
+    "vertebra_full",
 ]
 tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
 configs = ["full", "production"]
@@ -1013,11 +1093,33 @@ memory_limit_gigabytes = 24
 [[tiers.nightly.studies]]
 name = "thread_scaling"
 configs = ["threads_2", "threads_4", "threads_8", "threads_16"]
-cases = ["lorenz_d6_fine", "dadras_d8_fine"]
+cases = [
+    "lorenz_d6_coarse",
+    "dadras_d8_coarse",
+    "charney_devore_d12_box0.05",
+    "charney_devore_d12_box0.04",
+    "charney_devore_d12_box0.03",
+    "charney_devore_d12_box0.02",
+    "charney_devore_d12_box0.01",
+]
 
 [tiers.full]
 includes = ["nightly"]
-cases = ["kuramoto_sivashinsky_d16_coarse", "kuramoto_sivashinsky_d16_fine"]
+cases = [
+    "kuramoto_sivashinsky_d16_minimal",
+    "kuramoto_sivashinsky_d16_coarse",
+    "kuramoto_sivashinsky_d16_fine",
+    "s1_d16",
+    "torus_d16",
+    "ball_d6_r4",
+    "ball_d8_r2",
+    "curve_d16_n2000",
+    "curve_d16_n10000",
+    "curve_tb_d16",
+    "random_top_d8_p0.3",
+    "random_top_d8_p0.5",
+    "random_top_d8_p0.7",
+]
 tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
 configs = ["full", "production"]
 repetitions = 5

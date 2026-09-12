@@ -47,6 +47,66 @@ Each tool is on the image's `PATH` under `/opt/tools/bin`, the Python-hosted
 tools are reached through the interpreter `tools-python`, and the repository
 is mounted at `/work` when a case is run.
 
+## Running
+
+Measurements are taken one tier at a time. A tier names the cases to measure,
+how many times each measurement is repeated, how long one run may take before
+it is stopped, and how much memory one run may use before it is killed.
+
+| Tier | Budget | Measured | Repetitions | Timeout per run | Memory cap |
+| --- | --- | --- | --- | --- | --- |
+| `smoke` | 10 minutes | 3 minutes 42 seconds | 1 | 1 minute | 24 GB |
+| `quick` | 1 hour | 47 minutes | 3 | 5 minutes | 24 GB |
+| `nightly` | 8 hours | not yet measured | 3 | 20 minutes | 24 GB |
+| `full` | 48 hours | not yet measured | 5 | 60 minutes | 24 GB |
+
+What each tier holds beyond the smaller ones:
+
+- `smoke` is the correctness gate: one of the smaller cases of every family,
+  with a graded case, a mixed-dimension case and a volume among them.
+- `quick` adds the coarse flow covers, the smaller manifolds, the smaller
+  random cases, the small gradings and the downsampled volumes.
+- `nightly` adds the flow ladder in dimension 12, the medium manifolds, the
+  remaining cases in dimension 8, the grading sweeps, the thread-scaling study
+  and the volumes at full resolution.
+- `full` adds every case left, among them the flow covers in dimension 16, the
+  two largest balls, the largest random cases, and the circle, torus and curve
+  in dimension 16.
+
+The gate is run as:
+
+```
+uv run bench run smoke && uv run bench check smoke
+```
+
+`run` measures every tool on every case the tier asks for, one container per
+run, and writes one record per run under `results/runs/<tier>/`. `check` reads
+those records and compares the answers, against the closed form on a case that
+has one and otherwise tool against tool; it exits non-zero when two answers
+disagree, and reports as unchecked a case that no two tools answered.
+
+A run a tool cannot do is recorded as skipped with the reason rather than
+attempted, so a tool that reads no mixed-dimension input, or that would need
+more memory than the cap allows, costs nothing. A tier that was interrupted is
+resumed by running it again: it converts the cases of every run it can do, as
+it did the first time, and then passes over each run whose record already
+exists. To measure a case again, delete its records first.
+
+```
+uv run bench run <tier> --dry-run
+```
+
+prints one line per run saying whether it would run or be skipped and why, and
+ends with a ceiling: every run that is not skipped charged the whole of its
+timeout.
+
+| Tier | Runnable | Planned | Ceiling |
+| --- | --- | --- | --- |
+| `smoke` | 70 | 88 | 70 minutes |
+| `quick` | 291 | 368 | 73 hours |
+| `nightly` | 548 | 788 | 548 hours |
+| `full` | 592 | 892 | 2960 hours |
+
 ## Published image volumes
 
 One family of cases comes from scanned and simulated volumes that earlier work

@@ -1,11 +1,13 @@
 """pyCHomP2: a Python module, called through a script the run mounts.
 
 The engine takes no list of cubes. Its only constructor takes a box and fills it
-with 2^d cells per box position, dropping the last layer of each axis as a
-fringe, so a case reaches it as its bounding box padded by one along every axis
-with a value on every cell: the least grade among the listed cubes in the cell's
-star, and one above the largest grade in the case where no listed cube is in the
-star, so that the empty part of the box stays out of the answer.
+with 2^d cells per box position, identifying the far side of the box with the
+near side, so a case reaches it as its bounding box padded by two along every
+axis, the margin the module's own homology helper uses, with a value on every
+cell: the least grade among the listed cubes in the cell's star, and one above
+the largest grade in the case where no listed cube is in the star, so that the
+empty part of the box stays out of the answer. One layer of padding is not
+enough: on cases whose cubes reach the box edges the engine then loses classes.
 
 The answer derives from a connection matrix. On an ungraded case its cell counts
 at grade 0 are the Betti numbers. On a graded case the counts are not bar
@@ -31,7 +33,7 @@ BYTES_PER_CELL = 24
 CONSTRUCTION = "T"
 VERSION = "commit b7b11af5fc387a6f55f42dd8fabb8d710e50d7c6 (1.1.2)"
 SCRIPT = f"{SCRIPTS_MOUNT}/pychomp2_run.py"
-PADDING = 1
+PADDING = 2
 
 
 def version():
@@ -79,7 +81,7 @@ def skip_reason(case, config, memory_limit_bytes):
 
 def complex_cells(case):
     """The cells of the dense complex: 2^d for every position of the bounding
-    box padded by one along every axis."""
+    box padded by two along every axis."""
     volume = prod(
         maximum - minimum + 1 + PADDING for minimum, maximum in case.bounding_box
     )

@@ -2,17 +2,18 @@
 
 The pychomp engine builds nothing from a list of cubes. Its only constructor
 takes a box, the grid counts along each axis, and fills it with 2^d cells per
-box position, identifying the far side of the box with the near side. The
-engine drops the last layer of each axis as a fringe, so a case reaches it as
-the case's bounding box padded by one along every axis, with the listed cubes
-shifted to start at 0 and a value on every cell. A cell takes the least grade
-among the listed cubes in its star, and a cell with no listed cube in its star
-takes the absent value, one above the largest grade in the case, which keeps
-the empty part of the box out of the answer. The values are given per top cube
-to the engine's own `construct_grading`, which takes the least grade over the
-top cubes in a cell's star in C++. An ungraded case is that same construction
-with grade 0 on every listed cube, and its Betti numbers are the connection
-matrix's cell counts at grade 0, where no boundary entry stays within grade 0.
+box position, identifying the far side of the box with the near side, so a case
+reaches it as the case's bounding box padded by two along every axis, the margin
+the module's own homology helper uses, with the listed cubes shifted to start at
+0 and a value on every cell. One layer is not enough: on cases whose cubes reach
+the box edges the engine then loses classes. A cell takes the least grade among
+the listed cubes in its star, and a cell with no listed cube in its star takes
+the absent value, one above the largest grade in the case, which keeps the empty
+part of the box out of the answer. The values are given per top cube to the
+engine's own `construct_grading`, which takes the least grade over the top cubes
+in a cell's star in C++. An ungraded case is that same construction with grade 0
+on every listed cube, and its Betti numbers are the connection matrix's cell
+counts at grade 0, where no boundary entry stays within grade 0.
 
 On a graded case those cell counts are not bar counts: they count the cells
 that end a bar alongside the cells that start one. The bars come from reducing
@@ -37,7 +38,7 @@ import json
 
 from pychomp import ConnectionMatrix, CubicalComplex, GradedComplex, construct_grading
 
-PADDING = 1
+PADDING = 2
 
 
 def read_canonical(path, columns):
