@@ -30,11 +30,14 @@ version, and the limits the adapters enforce.
   has 3^d faces, and the tool builds them all. Above dimension 19 its
   reduction stage would in any event count neighbours in a 32-bit integer that
   overflows at 3^20 and could return a wrong reduction while appearing to
-  succeed. It has no filtration track, so graded cases skip it.
+  succeed. It has no filtration track, so graded cases skip it. The dimension
+  12 figure is a measurement from a single nightly run at a 20 minute timeout;
+  the suite as configured refuses those cases and does not repeat it.
 - pyCHomP2 takes only a box with a value per cell, never a cube list, so it is
   a dense tool: it is skipped when the box would need more memory than the
-  cap, at about 24 bytes per cell with 2^d cells per box position. Its output
-  is the cells of a connection matrix, not bars; the adapter pairs them
+  cap, at about 24 bytes per cell with 2^d cells per box position, the box
+  being the case's bounding box padded by two layers along every axis. Its
+  output is the cells of a connection matrix, not bars; the adapter pairs them
   itself. The box carries a value on top cubes only, so mixed-dimension cases
   skip it.
 - Perseus materialises every face of every cube, 3^d cells per cube, so one

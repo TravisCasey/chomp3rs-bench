@@ -28,7 +28,7 @@ def cpu_model():
 
 def repository_commit():
     commit = output_of(["git", "rev-parse", "HEAD"])
-    if output_of(["git", "status", "--porcelain"]):
+    if output_of(["git", "status", "--porcelain", "--untracked-files=no"]):
         return f"{commit}-dirty"
     return commit
 

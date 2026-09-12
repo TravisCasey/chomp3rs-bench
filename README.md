@@ -51,7 +51,7 @@ The package installs one command, which is run as
 - Network access for the image build and for the first `bench generate`, which
   downloads about 320 MB of published volumes.
 
-The numbers below were measured on a machine with 16 cores and 32 GB of memory,
+The numbers below were measured on a machine with 16 cores and 30 GB of memory,
 and every tier requests a 24 GB cap, which assumes a machine of about that size.
 The cap is a tier's `memory_limit_gigabytes` in `cases/manifest.toml`; set a
 smaller one there for a smaller machine. That number is also the boundary at

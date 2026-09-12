@@ -933,6 +933,14 @@ def draw_memory_volume(tables, width, label):
         Line2D(
             [],
             [],
+            label="cubical_ripser skip boundary (also refused above dimension 4)",
+            color=TOOL_STYLE[cubical_ripser.NAME]["color"],
+            linestyle=TOOL_STYLE[cubical_ripser.NAME]["dashes"],
+            linewidth=LINE_WIDTH,
+        ),
+        Line2D(
+            [],
+            [],
             label=f"horizontal line: the {tables.tier.memory_limit_gigabytes} GB cap",
             color=REFERENCE_COLOR,
             linestyle=(0, (1.0, 2.0)),

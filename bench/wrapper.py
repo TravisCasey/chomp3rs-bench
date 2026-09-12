@@ -28,6 +28,15 @@ from pathlib import Path
 
 IMAGE = "localhost/chomp3rs-bench:latest"
 TIME_BLOCK_MARKERS = ("Command being timed:", "Command terminated by signal")
+WALL_MARKER = "Tool wall nanoseconds:"
+CLOCK_SCRIPT = (
+    "start=$(date +%s%N); "
+    '"$@"; '
+    "status=$?; "
+    "end=$(date +%s%N); "
+    f'echo "{WALL_MARKER} $((end - start))" >&2; '
+    "exit $status"
+)
 
 
 @dataclass
@@ -71,6 +80,7 @@ def run_measured(
         ]
     command += ["--workdir", workdir, IMAGE]
     command += ["timeout", "-s", "KILL", str(timeout_seconds), "/usr/bin/time", "-v"]
+    command += ["sh", "-c", CLOCK_SCRIPT, "sh"]
     command += argv
 
     started = time.monotonic()
@@ -123,15 +133,22 @@ def run_measured(
 
 
 def split_time_block(stderr):
-    """Split the tool's own stderr from what `/usr/bin/time -v` printed after it."""
+    """Split the tool's own stderr from the clock line the shell printed and
+    from what `/usr/bin/time -v` printed after it."""
     lines = stderr.splitlines()
     start = len(lines)
     for index, line in enumerate(lines):
         if line.strip().startswith(TIME_BLOCK_MARKERS):
             start = index
             break
-    tool_stderr = "\n".join(lines[:start])
     block = {}
+    tool_lines = []
+    for line in lines[:start]:
+        if line.strip().startswith(WALL_MARKER):
+            block["wall_seconds"] = int(line.strip().split(":")[1]) / 1e9
+        else:
+            tool_lines.append(line)
+    tool_stderr = "\n".join(tool_lines)
     for line in lines[start:]:
         stripped = line.strip()
         if stripped.startswith("User time (seconds):"):
@@ -140,14 +157,4 @@ def split_time_block(stderr):
             block["system_seconds"] = float(stripped.split(":")[1])
         elif stripped.startswith("Maximum resident set size (kbytes):"):
             block["peak_rss_kilobytes"] = int(stripped.split(":")[1])
-        elif stripped.startswith("Elapsed (wall clock) time"):
-            block["wall_seconds"] = elapsed_seconds(stripped.split(": ")[1])
     return tool_stderr, block
-
-
-def elapsed_seconds(text):
-    """Read `time`'s elapsed field, which is `h:mm:ss` or `m:ss.ss`."""
-    seconds = 0.0
-    for field in text.split(":"):
-        seconds = seconds * 60 + float(field)
-    return seconds
