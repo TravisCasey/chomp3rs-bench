@@ -736,6 +736,204 @@ generator = "random_grades"
 seed = 74
 parameters = { base = "lorenz_d6_coarse", grade_count = 8 }
 
+[cases.silicium_downsample2]
+file = "generated/silicium_downsample2.csv"
+family = "published"
+columns = "plain"
+size = "small"
+generator = "published"
+seed = 75
+parameters = { dataset = "silicium", threshold = 128, downsample = 2 }
+
+[cases.silicium_full]
+file = "generated/silicium_full.csv"
+family = "published"
+columns = "plain"
+size = "medium"
+generator = "published"
+seed = 76
+parameters = { dataset = "silicium", threshold = 128, downsample = 1 }
+
+[cases.fuel_downsample2]
+file = "generated/fuel_downsample2.csv"
+family = "published"
+columns = "plain"
+size = "small"
+generator = "published"
+seed = 77
+parameters = { dataset = "fuel", threshold = 1, downsample = 2 }
+
+[cases.fuel_full]
+file = "generated/fuel_full.csv"
+family = "published"
+columns = "plain"
+size = "medium"
+generator = "published"
+seed = 78
+parameters = { dataset = "fuel", threshold = 1, downsample = 1 }
+
+[cases.marschner_lobb_downsample2]
+file = "generated/marschner_lobb_downsample2.csv"
+family = "published"
+columns = "plain"
+size = "small"
+generator = "published"
+seed = 79
+parameters = { dataset = "marschner_lobb", threshold = 224, downsample = 2 }
+
+[cases.marschner_lobb_full]
+file = "generated/marschner_lobb_full.csv"
+family = "published"
+columns = "plain"
+size = "medium"
+generator = "published"
+seed = 80
+parameters = { dataset = "marschner_lobb", threshold = 224, downsample = 1 }
+
+[cases.neghip_downsample2]
+file = "generated/neghip_downsample2.csv"
+family = "published"
+columns = "plain"
+size = "medium"
+generator = "published"
+seed = 81
+parameters = { dataset = "neghip", threshold = 32, downsample = 2 }
+
+[cases.neghip_full]
+file = "generated/neghip_full.csv"
+family = "published"
+columns = "plain"
+size = "medium"
+generator = "published"
+seed = 82
+parameters = { dataset = "neghip", threshold = 32, downsample = 1 }
+
+[cases.hydrogen_atom_downsample2]
+file = "generated/hydrogen_atom_downsample2.csv"
+family = "published"
+columns = "plain"
+size = "medium"
+generator = "published"
+seed = 83
+parameters = { dataset = "hydrogen_atom", threshold = 8, downsample = 2 }
+
+[cases.hydrogen_atom_full]
+file = "generated/hydrogen_atom_full.csv"
+family = "published"
+columns = "plain"
+size = "large"
+generator = "published"
+seed = 84
+parameters = { dataset = "hydrogen_atom", threshold = 8, downsample = 1 }
+
+[cases.engine_downsample2]
+file = "generated/engine_downsample2.csv"
+family = "published"
+columns = "plain"
+size = "medium"
+generator = "published"
+seed = 85
+parameters = { dataset = "engine", threshold = 144, downsample = 2 }
+
+[cases.engine_full]
+file = "generated/engine_full.csv"
+family = "published"
+columns = "plain"
+size = "large"
+generator = "published"
+seed = 86
+parameters = { dataset = "engine", threshold = 144, downsample = 1 }
+
+[cases.tooth_downsample2]
+file = "generated/tooth_downsample2.csv"
+family = "published"
+columns = "plain"
+size = "medium"
+generator = "published"
+seed = 87
+parameters = { dataset = "tooth", threshold = 176, downsample = 2 }
+
+[cases.tooth_full]
+file = "generated/tooth_full.csv"
+family = "published"
+columns = "plain"
+size = "large"
+generator = "published"
+seed = 88
+parameters = { dataset = "tooth", threshold = 176, downsample = 1 }
+
+[cases.aneurism_downsample2]
+file = "generated/aneurism_downsample2.csv"
+family = "published"
+columns = "plain"
+size = "medium"
+generator = "published"
+seed = 89
+parameters = { dataset = "aneurism", threshold = 1, downsample = 2 }
+
+[cases.aneurism_full]
+file = "generated/aneurism_full.csv"
+family = "published"
+columns = "plain"
+size = "large"
+generator = "published"
+seed = 90
+parameters = { dataset = "aneurism", threshold = 1, downsample = 1 }
+
+[cases.bonsai_downsample2]
+file = "generated/bonsai_downsample2.csv"
+family = "published"
+columns = "plain"
+size = "large"
+generator = "published"
+seed = 91
+parameters = { dataset = "bonsai", threshold = 128, downsample = 2 }
+
+[cases.bonsai_full]
+file = "generated/bonsai_full.csv"
+family = "published"
+columns = "plain"
+size = "large"
+generator = "published"
+seed = 92
+parameters = { dataset = "bonsai", threshold = 128, downsample = 1 }
+
+[cases.foot_downsample2]
+file = "generated/foot_downsample2.csv"
+family = "published"
+columns = "plain"
+size = "large"
+generator = "published"
+seed = 93
+parameters = { dataset = "foot", threshold = 64, downsample = 2 }
+
+[cases.foot_full]
+file = "generated/foot_full.csv"
+family = "published"
+columns = "plain"
+size = "large"
+generator = "published"
+seed = 94
+parameters = { dataset = "foot", threshold = 64, downsample = 1 }
+
+[cases.vertebra_downsample8]
+file = "generated/vertebra_downsample8.csv"
+family = "published"
+columns = "plain"
+size = "large"
+generator = "published"
+seed = 95
+parameters = { dataset = "vertebra", threshold = 450, downsample = 8 }
+
+[cases.vertebra_full]
+file = "generated/vertebra_full.csv"
+family = "published"
+columns = "plain"
+size = "large"
+generator = "published"
+seed = 96
+parameters = { dataset = "vertebra", threshold = 450, downsample = 1 }
+
 [configs.full]
 backend = "sequential"
 threads = 1
@@ -779,6 +977,7 @@ cases = [
     "random_mixed_d4_n500",
     "curve_d4_n2000",
     "s1_d4_sweep_g4",
+    "marschner_lobb_downsample2",
 ]
 tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
 configs = ["full", "production"]

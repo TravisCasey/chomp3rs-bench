@@ -5,7 +5,7 @@ generate` looks it up here and calls it with the case's name, seed, parameters
 and the directory the case file belongs in.
 """
 
-from bench.generators import curves, gradings, manifolds, random_cubes
+from bench.generators import curves, gradings, manifolds, published, random_cubes
 
 GENERATORS = {
     "s1": manifolds.s1,
@@ -18,4 +18,5 @@ GENERATORS = {
     "curve": curves.curve,
     "sweep": gradings.sweep,
     "random_grades": gradings.random_grades,
+    "published": published.published,
 }
