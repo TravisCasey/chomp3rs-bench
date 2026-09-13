@@ -241,9 +241,8 @@ smaller tier yields a subset of the ten.
 
 A run the tier stopped is drawn where it stopped. A run out of time is an open
 marker at the tier's timeout; a run killed for memory is a cross, at the wall
-time it reached on a time axis and at the cap on a memory axis; a wall time
-below the timer's 0.01 second resolution is an open marker at that floor; and an
-answer the check disputed is drawn inside a black ring. A run out of time has no
+time it reached on a time axis and at the cap on a memory axis; and an answer
+the check disputed is drawn inside a black ring. A run out of time has no
 peak to draw and is absent from a memory axis, and a run that ended in an error
 is not drawn at all but is named in a printed line. Every figure's legend names
 the conventions that figure uses.

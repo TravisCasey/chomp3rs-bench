@@ -16,7 +16,8 @@ The classification:
   system time and peak resident set size are absent.
 - `tools-python -c "bytearray(3 * 10**9)"` under a 512 MB cap ends as
   `out_of_memory`: the container is reported as killed for memory, and `time`
-  reports the kill by signal 9 with a peak resident set size at the cap.
+  reports that the command exited with status 137, the shell's translation of
+  the kill by signal 9, with a peak resident set size at the cap.
 - any other nonzero exit ends as `error`.
 """
 
@@ -34,7 +35,7 @@ CLOCK_SCRIPT = (
     '"$@"; '
     "status=$?; "
     "end=$(date +%s%N); "
-    f'echo "{WALL_MARKER} $((end - start))" >&2; '
+    f"printf '\\n%s %s\\n' '{WALL_MARKER}' \"$((end - start))\" >&2; "
     "exit $status"
 )
 
@@ -106,19 +107,15 @@ def run_measured(
     peak_rss_kilobytes = block.get("peak_rss_kilobytes")
     wall_seconds = block.get("wall_seconds", wrapper_seconds)
 
-    signalled = "Command terminated by signal 9" in completed.stderr
-    at_the_cap = (
-        peak_rss_kilobytes is not None
-        and peak_rss_kilobytes * 1024 > 0.9 * memory_limit_bytes
+    status = classify(
+        completed.stderr,
+        exit_code=exit_code,
+        wall_seconds=wall_seconds,
+        peak_rss_kilobytes=peak_rss_kilobytes,
+        memory_killed=memory_killed,
+        timeout_seconds=timeout_seconds,
+        memory_limit_bytes=memory_limit_bytes,
     )
-    if memory_killed or (signalled and at_the_cap):
-        status = "out_of_memory"
-    elif exit_code == 137 or wall_seconds > timeout_seconds:
-        status = "timeout"
-    elif exit_code != 0:
-        status = "error"
-    else:
-        status = "finished"
 
     return Measurement(
         status=status,
@@ -130,6 +127,34 @@ def run_measured(
         stdout=completed.stdout,
         stderr=tool_stderr,
     )
+
+
+def classify(
+    stderr,
+    *,
+    exit_code,
+    wall_seconds,
+    peak_rss_kilobytes,
+    memory_killed,
+    timeout_seconds,
+    memory_limit_bytes,
+):
+    """How the run ended, given what podman and `time` reported. A tool the
+    cgroup kills is reaped by the shell between `time` and the tool, so `time`
+    reports status 137 rather than the signal; a 137 with a peak at the cap is
+    the memory kill and a 137 with a peak below it is the timeout."""
+    exited_137 = "Command exited with non-zero status 137" in stderr
+    at_the_cap = (
+        peak_rss_kilobytes is not None
+        and peak_rss_kilobytes * 1024 > 0.9 * memory_limit_bytes
+    )
+    if memory_killed or (exited_137 and at_the_cap):
+        return "out_of_memory"
+    if exit_code == 137 or wall_seconds > timeout_seconds:
+        return "timeout"
+    if exit_code != 0:
+        return "error"
+    return "finished"
 
 
 def split_time_block(stderr):

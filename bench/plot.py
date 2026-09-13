@@ -5,10 +5,8 @@ Reads `results/summary/<tier>/runs.csv` and `stages.csv` and writes
 `FIGURES`. A figure whose cases or tools are not in the tables is not drawn and
 prints one line saying what is missing.
 
-A run the tier stopped is drawn where it stopped rather than dropped. A time
-axis is censored at both ends and an open marker says so at either: above, a run
-out of time sits at the tier's timeout, and below, a run the timer could not
-separate from zero sits at its 0.01 second resolution. A run killed for memory
+A run the tier stopped is drawn where it stopped rather than dropped. A run out
+of time sits at the tier's timeout as an open marker. A run killed for memory
 is a cross, at the wall time it reached on a time axis and at the cap on a
 memory axis; a run out of time has no peak to draw and is absent from a memory
 axis. A group whose repetitions ended differently is drawn at its medians with
@@ -53,7 +51,6 @@ TIME_AXIS = "time"
 MEMORY_AXIS = "memory"
 KILOBYTES_PER_GIGABYTE = 1024 * 1024
 BYTES_PER_GIGABYTE = 1024**3
-TIME_RESOLUTION_SECONDS = 0.01
 
 FILLED_POINT = "filled"
 OPEN_POINT = "open"
@@ -274,9 +271,8 @@ def case_label(name):
 def point_of(tables, row, axis):
     """Where a row sits on a time or a memory axis and which marker says how it
     got there, or `None` where the row has nothing to say on that axis. A time
-    axis is censored at both ends: a run out of time sits at the tier's timeout
-    and a run the timer could not separate from zero sits at its resolution, and
-    both read as open markers."""
+    axis is censored above: a run out of time sits at the tier's timeout and
+    reads as an open marker."""
     status = row["status"]
     if axis == TIME_AXIS:
         if status == summarize.TIMEOUT:
@@ -285,10 +281,7 @@ def point_of(tables, row, axis):
             return number_of(row, "wall_median"), KILLED_POINT
         if status not in summarize.COMPARABLE:
             return None
-        wall = number_of(row, "wall_median")
-        if wall < TIME_RESOLUTION_SECONDS:
-            return TIME_RESOLUTION_SECONDS, OPEN_POINT
-        return wall, FILLED_POINT
+        return number_of(row, "wall_median"), FILLED_POINT
     if status == summarize.OUT_OF_MEMORY:
         return float(tables.tier.memory_limit_gigabytes), KILLED_POINT
     if status not in summarize.COMPARABLE:
@@ -405,10 +398,7 @@ def censored_handles(tables, rows, axis):
             Line2D(
                 [],
                 [],
-                label=(
-                    "open marker: censored at the timer's bound (timeout above,"
-                    f" {TIME_RESOLUTION_SECONDS} s resolution below)"
-                ),
+                label="open marker: censored at the timeout",
                 linestyle="none",
                 marker="o",
                 markersize=MARKER_SIZE + 0.6,
@@ -933,7 +923,11 @@ def draw_memory_volume(tables, width, label):
         Line2D(
             [],
             [],
-            label="cubical_ripser skip boundary (also refused above dimension 4)",
+            label=(
+                f"{TOOL_STYLE[cubical_ripser.NAME]['label']} skip boundary"
+                " (also refused above dimension"
+                f" {cubical_ripser.MAXIMUM_DIMENSION})"
+            ),
             color=TOOL_STYLE[cubical_ripser.NAME]["color"],
             linestyle=TOOL_STYLE[cubical_ripser.NAME]["dashes"],
             linewidth=LINE_WIDTH,
