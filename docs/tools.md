@@ -35,7 +35,7 @@ version, and the limits the adapters enforce.
   the suite as configured refuses those cases and does not repeat it.
 - pyCHomP2 takes only a box with a value per cell, never a cube list, so it is
   a dense tool: it is skipped when the box would need more memory than the
-  cap, at about 24 bytes per cell with 2^d cells per box position, the box
+  cap, at about 14 bytes per cell with 2^d cells per box position, the box
   being the case's bounding box padded by two layers along every axis. Its
   output is the cells of a connection matrix, not bars; the adapter pairs them
   itself. The box carries a value on top cubes only, so mixed-dimension cases
@@ -68,7 +68,7 @@ version, and the limits the adapters enforce.
   dimensional. It takes a dense grid with one value per top cube, so the grid
   needs no conversion, and it is skipped when the complex, `(2n + 1)^d` cells
   for a case of grid side n in d dimensions, needs more than the memory cap at
-  about 14 bytes a cell. It reads top cells only, so mixed-dimension cases skip
+  about 18 bytes a cell. It reads top cells only, so mixed-dimension cases skip
   it.
 
 ## Build notes

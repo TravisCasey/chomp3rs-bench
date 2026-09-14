@@ -1122,6 +1122,6 @@ cases = [
 ]
 tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
 configs = ["full", "production"]
-repetitions = 5
+repetitions = 3
 timeout_seconds = 3600
 memory_limit_gigabytes = 24

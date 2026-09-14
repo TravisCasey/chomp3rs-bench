@@ -131,7 +131,7 @@ it is stopped, and how much memory one run may use before it is killed.
 | `smoke` | 10 minutes | 3 minutes 42 seconds | 1 | 1 minute | 24 GB |
 | `quick` | 1 hour | 47 minutes | 3 | 5 minutes | 24 GB |
 | `nightly` | 8 hours | not yet measured | 3 | 20 minutes | 24 GB |
-| `full` | 48 hours | not yet measured | 5 | 60 minutes | 24 GB |
+| `full` | 48 hours | not yet measured | 3 | 60 minutes | 24 GB |
 
 What each tier holds beyond the smaller ones:
 
@@ -175,10 +175,10 @@ timeout.
 
 | Tier | Runnable | Planned | Ceiling |
 | --- | --- | --- | --- |
-| `smoke` | 70 | 88 | 70 minutes |
-| `quick` | 291 | 368 | 73 hours |
-| `nightly` | 548 | 788 | 548 hours |
-| `full` | 592 | 892 | 2960 hours |
+| `smoke` | 74 | 88 | 74 minutes |
+| `quick` | 304 | 368 | 76 hours |
+| `nightly` | 585 | 788 | 585 hours |
+| `full` | 634 | 892 | 1902 hours |
 
 ## Checking the answers
 
