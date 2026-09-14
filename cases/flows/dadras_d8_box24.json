@@ -2,20 +2,20 @@
   "ambient_dimension": 8,
   "bounding_box": [
     [
-      -48,
-      51
+      -6,
+      6
     ],
     [
-      -45,
-      40
+      -6,
+      5
     ],
     [
-      -52,
-      47
+      -7,
+      5
     ],
     [
-      -3,
-      2
+      -1,
+      0
     ],
     [
       -4,
@@ -34,14 +34,14 @@
       0
     ]
   ],
-  "bounding_box_volume": 7925760000,
-  "cube_count": 83404,
+  "bounding_box_volume": 6230016,
+  "cube_count": 4057,
   "family": "flows",
   "grade_count": null,
   "graded": false,
   "mixed_dimension": false,
   "source": {
-    "file": "flows/dadras_d8_fine.csv",
+    "file": "flows/dadras_d8_box24.csv",
     "kind": "committed"
   }
 }

@@ -9,10 +9,16 @@ deduplicated and in lexicographic order, no header.
 
 | File | Ambient dim | Cubes | Box size |
 | --- | --- | --- | --- |
-| `lorenz_d6_coarse.csv` | 6 | 788 | 5.0 |
-| `lorenz_d6_fine.csv` | 6 | 74,129 | 0.25 |
-| `dadras_d8_coarse.csv` | 8 | 9,019 | 12.0 |
-| `dadras_d8_fine.csv` | 8 | 83,404 | 3.0 |
+| `lorenz_d6_box5.csv` | 6 | 788 | 5.0 |
+| `lorenz_d6_box2.5.csv` | 6 | 1,781 | 2.5 |
+| `lorenz_d6_box1.25.csv` | 6 | 4,758 | 1.25 |
+| `lorenz_d6_box0.5.csv` | 6 | 21,425 | 0.5 |
+| `lorenz_d6_box0.25.csv` | 6 | 74,129 | 0.25 |
+| `lorenz_d6_box0.125.csv` | 6 | 268,329 | 0.125 |
+| `dadras_d8_box24.csv` | 8 | 4,057 | 24.0 |
+| `dadras_d8_box12.csv` | 8 | 9,019 | 12.0 |
+| `dadras_d8_box6.csv` | 8 | 23,631 | 6.0 |
+| `dadras_d8_box3.csv` | 8 | 83,404 | 3.0 |
 | `charney_devore_d12_box0.05.csv` | 12 | 12,839 | 0.05 |
 | `charney_devore_d12_box0.04.csv` | 12 | 16,800 | 0.04 |
 | `charney_devore_d12_box0.03.csv` | 12 | 24,735 | 0.03 |
@@ -22,9 +28,10 @@ deduplicated and in lexicographic order, no header.
 | `kuramoto_sivashinsky_d16_coarse.csv` | 16 | 41,417 | 4.0 |
 | `kuramoto_sivashinsky_d16_fine.csv` | 16 | 65,913 | 1.0 |
 
-The five dimension-12 files are one trajectory read at five resolutions, so
-they form a size ladder with everything else held fixed: the flow, the
-sampling and the embedding are identical, and only the box size moves.
+The six Lorenz files, the four Dadras files and the five dimension-12 files
+are each one trajectory read at several resolutions, so each system forms a
+size ladder with everything else held fixed: the flow, the sampling and the
+embedding are identical, and only the box size moves.
 
 ## Construction
 

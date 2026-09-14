@@ -142,10 +142,16 @@ MANIFOLD_FAMILIES = ("s1", "torus")
 PUBLISHED_FAMILY = "published"
 
 FLOW_COVERS = (
-    "lorenz_d6_coarse",
-    "lorenz_d6_fine",
-    "dadras_d8_coarse",
-    "dadras_d8_fine",
+    "lorenz_d6_box5",
+    "lorenz_d6_box2.5",
+    "lorenz_d6_box1.25",
+    "lorenz_d6_box0.5",
+    "lorenz_d6_box0.25",
+    "lorenz_d6_box0.125",
+    "dadras_d8_box24",
+    "dadras_d8_box12",
+    "dadras_d8_box6",
+    "dadras_d8_box3",
     "charney_devore_d12_box0.05",
     "charney_devore_d12_box0.04",
     "charney_devore_d12_box0.03",

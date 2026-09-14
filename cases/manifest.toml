@@ -1,23 +1,59 @@
-[cases.lorenz_d6_coarse]
-file = "flows/lorenz_d6_coarse.csv"
+[cases.lorenz_d6_box5]
+file = "flows/lorenz_d6_box5.csv"
 family = "flows"
 columns = "plain"
 size = "small"
 
-[cases.lorenz_d6_fine]
-file = "flows/lorenz_d6_fine.csv"
+[cases."lorenz_d6_box0.25"]
+file = "flows/lorenz_d6_box0.25.csv"
 family = "flows"
 columns = "plain"
 size = "medium"
 
-[cases.dadras_d8_coarse]
-file = "flows/dadras_d8_coarse.csv"
+[cases.dadras_d8_box12]
+file = "flows/dadras_d8_box12.csv"
 family = "flows"
 columns = "plain"
 size = "small"
 
-[cases.dadras_d8_fine]
-file = "flows/dadras_d8_fine.csv"
+[cases.dadras_d8_box3]
+file = "flows/dadras_d8_box3.csv"
+family = "flows"
+columns = "plain"
+size = "medium"
+
+[cases."lorenz_d6_box2.5"]
+file = "flows/lorenz_d6_box2.5.csv"
+family = "flows"
+columns = "plain"
+size = "small"
+
+[cases."lorenz_d6_box1.25"]
+file = "flows/lorenz_d6_box1.25.csv"
+family = "flows"
+columns = "plain"
+size = "small"
+
+[cases."lorenz_d6_box0.5"]
+file = "flows/lorenz_d6_box0.5.csv"
+family = "flows"
+columns = "plain"
+size = "medium"
+
+[cases."lorenz_d6_box0.125"]
+file = "flows/lorenz_d6_box0.125.csv"
+family = "flows"
+columns = "plain"
+size = "large"
+
+[cases.dadras_d8_box24]
+file = "flows/dadras_d8_box24.csv"
+family = "flows"
+columns = "plain"
+size = "small"
+
+[cases.dadras_d8_box6]
+file = "flows/dadras_d8_box6.csv"
 family = "flows"
 columns = "plain"
 size = "medium"
@@ -727,14 +763,14 @@ generator = "random_grades"
 seed = 73
 parameters = { base = "random_top_d4_p0.5", grade_count = 8 }
 
-[cases.lorenz_d6_coarse_random_g8]
-file = "generated/lorenz_d6_coarse_random_g8.csv"
+[cases.lorenz_d6_box5_random_g8]
+file = "generated/lorenz_d6_box5_random_g8.csv"
 family = "flows"
 columns = "graded"
 size = "small"
 generator = "random_grades"
 seed = 74
-parameters = { base = "lorenz_d6_coarse", grade_count = 8 }
+parameters = { base = "lorenz_d6_box5", grade_count = 8 }
 
 [cases.silicium_downsample2]
 file = "generated/silicium_downsample2.csv"
@@ -968,7 +1004,7 @@ modulus = 2
 
 [tiers.smoke]
 cases = [
-    "lorenz_d6_coarse",
+    "lorenz_d6_box5",
     "s1_d4",
     "torus_d3",
     "ball_d4_r2",
@@ -989,7 +1025,7 @@ memory_limit_gigabytes = 24
 [tiers.quick]
 includes = ["smoke"]
 cases = [
-    "dadras_d8_coarse",
+    "dadras_d8_box12",
     "s1_d2",
     "s1_d6",
     "ball_d2_r2",
@@ -1013,7 +1049,7 @@ cases = [
     "s1_d4_sweep_g16",
     "s1_d4_sweep_g64",
     "random_top_d4_p0.5_random_g8",
-    "lorenz_d6_coarse_random_g8",
+    "lorenz_d6_box5_random_g8",
     "silicium_downsample2",
     "fuel_downsample2",
     "neghip_downsample2",
@@ -1039,8 +1075,14 @@ cases = [
     "charney_devore_d12_box0.03",
     "charney_devore_d12_box0.02",
     "charney_devore_d12_box0.01",
-    "lorenz_d6_fine",
-    "dadras_d8_fine",
+    "lorenz_d6_box2.5",
+    "lorenz_d6_box1.25",
+    "lorenz_d6_box0.5",
+    "lorenz_d6_box0.25",
+    "lorenz_d6_box0.125",
+    "dadras_d8_box24",
+    "dadras_d8_box6",
+    "dadras_d8_box3",
     "s1_d8",
     "s1_d12",
     "torus_d4",
@@ -1094,8 +1136,8 @@ memory_limit_gigabytes = 24
 name = "thread_scaling"
 configs = ["threads_2", "threads_4", "threads_8", "threads_16"]
 cases = [
-    "lorenz_d6_coarse",
-    "dadras_d8_coarse",
+    "lorenz_d6_box5",
+    "dadras_d8_box12",
     "charney_devore_d12_box0.05",
     "charney_devore_d12_box0.04",
     "charney_devore_d12_box0.03",

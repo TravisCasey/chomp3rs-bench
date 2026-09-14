@@ -1,21 +1,21 @@
 {
-  "ambient_dimension": 8,
+  "ambient_dimension": 6,
   "bounding_box": [
     [
-      -12,
-      12
+      -4,
+      3
     ],
     [
-      -12,
-      10
+      -6,
+      5
     ],
     [
-      -13,
-      11
+      0,
+      9
     ],
     [
-      -1,
-      0
+      -3,
+      2
     ],
     [
       -4,
@@ -24,24 +24,16 @@
     [
       -4,
       3
-    ],
-    [
-      -4,
-      3
-    ],
-    [
-      -2,
-      0
     ]
   ],
-  "bounding_box_volume": 44160000,
-  "cube_count": 9019,
+  "bounding_box_volume": 368640,
+  "cube_count": 788,
   "family": "flows",
   "grade_count": null,
   "graded": false,
   "mixed_dimension": false,
   "source": {
-    "file": "flows/dadras_d8_coarse.csv",
+    "file": "flows/lorenz_d6_box5.csv",
     "kind": "committed"
   }
 }

@@ -177,8 +177,8 @@ timeout.
 | --- | --- | --- | --- |
 | `smoke` | 74 | 88 | 74 minutes |
 | `quick` | 304 | 368 | 76 hours |
-| `nightly` | 585 | 788 | 585 hours |
-| `full` | 634 | 892 | 1902 hours |
+| `nightly` | 615 | 836 | 615 hours |
+| `full` | 664 | 940 | 1992 hours |
 
 ## Checking the answers
 
