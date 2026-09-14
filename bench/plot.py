@@ -910,13 +910,16 @@ def draw_grade_count(tables, width, label):
 
 def draw_thread_scaling(tables, width, label):
     note_errors(label, [row for row in tables.runs if row["config"] in THREAD_CONFIGS])
-    threaded = [row for row in tables.stages if row["config"] in THREAD_CONFIGS]
+    threaded = {row["case"] for row in tables.stages if row["config"] in THREAD_CONFIGS}
     if not threaded:
         return "no chomp3rs thread configuration in the stage table"
-    counts = {}
-    for row in threaded:
-        counts[row["case"]] = counts.get(row["case"], 0) + 1
-    case = max(counts, key=lambda name: (counts[name], name))
+    sequential = {}
+    for row in tables.stages:
+        if row["case"] in threaded and row["config"] == FULL_CONFIG:
+            sequential[row["case"]] = sequential.get(row["case"], 0.0) + float(
+                row["seconds_median"]
+            )
+    case = max(sequential, key=sequential.get)
     configs = [FULL_CONFIG, *THREAD_CONFIGS]
     seconds = {}
     for row in tables.stages:
