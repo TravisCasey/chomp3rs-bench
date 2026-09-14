@@ -232,20 +232,22 @@ measured medians, takes the worst of their statuses, and lists the mix in its
 uv run bench plot smoke
 ```
 
-writes `figures/<tier>/fig<NN>_<name>.pdf` and `.png`. The ten figures are, in
-order, `headline_flows`, `ladder_d12`, `dimension_manifolds`, `sphere_table1`,
-`density_random_top`, `mixed_dimension`, `grade_count`, `thread_scaling`,
-`memory_volume` and `published_sets`. A figure whose cases or tools the tier's
-tables do not hold is not drawn, and one line says what was missing, so a
-smaller tier yields a subset of the ten.
+writes `figures/<tier>/fig<NN>_<name>.pdf` and `.png`. The eleven figures are,
+in order, `headline_flows`, `ladder_d12`, `dimension_manifolds`,
+`sphere_table1`, `density_random_top`, `mixed_dimension`, `grade_count`,
+`thread_scaling`, `memory_volume`, `published_sets` and `coverage`. A figure
+whose cases or tools the tier's tables do not hold is not drawn, and one line
+says what was missing, so a smaller tier yields a subset of the eleven.
 
-A run the tier stopped is drawn where it stopped. A run out of time is an open
-marker at the tier's timeout; a run killed for memory is a cross, at the wall
-time it reached on a time axis and at the cap on a memory axis; and an answer
-the check disputed is drawn inside a black ring. A run out of time has no
-peak to draw and is absent from a memory axis, and a run that ended in an error
-is not drawn at all but is named in a printed line. Every figure's legend names
-the conventions that figure uses.
+A mark on a time axis is a measurement. A run the tier stopped is drawn in a
+lane beside the axes instead, in the column or row of its case: an open marker
+for a run out of time, a cross for a run killed for memory. On a memory axis a
+killed run reached the cap and sits on the cap line as an open marker, while a
+run out of time has no peak to draw and is absent. An answer the check disputed
+is drawn inside a black ring, and a run that ended in an error is not drawn at
+all but is named in a printed line. Every figure's legend names the conventions
+that figure uses. The last figure, `coverage`, shows for every ungraded case of
+the tier which tools finished, were stopped, were killed, or refused it and why.
 
 Figure 4 draws `figures/reference/table1.csv`, a transcription of Table 1(a) of
 arXiv 2105.09870, beside the suite's own sphere cases.
