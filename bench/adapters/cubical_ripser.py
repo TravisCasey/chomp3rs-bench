@@ -48,6 +48,7 @@ PROGRAM = "tcubicalripser"
 CONVERTED_DIRECTORY = Path("cases/converted/cubical_ripser")
 GRID_SUFFIX = ".txt"
 DIAGRAM_SUFFIX = ".csv"
+PARTIAL_SUFFIX = ".part"
 LOCATION = "none"
 HOMOLOGY_TRACK = "homology"
 PERSISTENCE_TRACK = "persistence"
@@ -65,9 +66,11 @@ def convert(case):
     header = [str(values.ndim), *(str(side) for side in values.shape)]
     flattened = values.ravel(order="F").astype(numpy.int64, copy=False)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w") as text:
+    partial = path.with_suffix(GRID_SUFFIX + PARTIAL_SUFFIX)
+    with partial.open("w") as text:
         text.write("\n".join(header) + "\n")
         numpy.savetxt(text, flattened, fmt="%d")
+    partial.replace(path)
     return path
 
 

@@ -35,6 +35,7 @@ VERSION = (
 SCRIPT = f"{SCRIPTS_MOUNT}/gudhi_run.py"
 CONVERTED_DIRECTORY = Path("cases/converted/gudhi")
 SUFFIX = ".npy"
+PARTIAL_SUFFIX = ".part"
 MODULUS = "2"
 
 
@@ -47,7 +48,10 @@ def convert(case):
     if path.exists() and path.stat().st_mtime >= case.path.stat().st_mtime:
         return path
     path.parent.mkdir(parents=True, exist_ok=True)
-    numpy.save(path, dense.top_cell_values(case))
+    partial = path.with_suffix(SUFFIX + PARTIAL_SUFFIX)
+    with partial.open("wb") as binary:
+        numpy.save(binary, dense.top_cell_values(case))
+    partial.replace(path)
     return path
 
 

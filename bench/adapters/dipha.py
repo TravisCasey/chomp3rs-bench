@@ -76,6 +76,7 @@ VERSION = "commit 0b874769fbd092c07a12cebc2459adb02117c2fd"
 CONVERTED_DIRECTORY = Path("cases/converted/dipha")
 COMPLEX_SUFFIX = ".complex"
 DIAGRAM_SUFFIX = ".diagram"
+PARTIAL_SUFFIX = ".part"
 MAGIC = 8067171840
 WEIGHTED_BOUNDARY_MATRIX = 0
 BOUNDARY = 0
@@ -128,7 +129,8 @@ def convert(case):
     offsets = numpy.concatenate(([0], numpy.cumsum(2 * dimensions)))
     count = cells.shape[0] + 1
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("wb") as binary:
+    partial = path.with_suffix(COMPLEX_SUFFIX + PARTIAL_SUFFIX)
+    with partial.open("wb") as binary:
         header = [MAGIC, WEIGHTED_BOUNDARY_MATRIX, BOUNDARY, count, dimension]
         numpy.array(header, dtype=INTEGER).tofile(binary)
         numpy.append(dimensions, 0).astype(INTEGER).tofile(binary)
@@ -139,6 +141,7 @@ def convert(case):
         numpy.array([offsets[-1]], dtype=INTEGER).tofile(binary)
         del offsets
         write_boundaries(binary, cells, fields, words)
+    partial.replace(path)
     return path
 
 

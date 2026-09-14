@@ -36,6 +36,7 @@ VERSION = (
 )
 CONVERTED_DIRECTORY = Path("cases/converted/perseus")
 SUFFIX = ".txt"
+PARTIAL_SUFFIX = ".part"
 MODE = "scubtop"
 BIRTH_SHIFT = 1
 NEVER_DIES = -1
@@ -62,7 +63,9 @@ def convert(case):
             " ".join(str(int(value)) for value in shifted[index]) + f" {birth}"
         )
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(lines) + "\n")
+    partial = path.with_suffix(SUFFIX + PARTIAL_SUFFIX)
+    partial.write_text("\n".join(lines) + "\n")
+    partial.replace(path)
     return path
 
 

@@ -38,6 +38,7 @@ CONVERTED_DIRECTORY = Path("cases/converted/homcubes")
 CUBE_SUFFIX = ".cub"
 CELL_SUFFIX = ".cel"
 BETTI_SUFFIX = ".betti"
+PARTIAL_SUFFIX = ".part"
 
 
 def version():
@@ -60,7 +61,9 @@ def convert(case):
         lines = [f"dimension {dimension}"]
         lines += [cube_line(row) for row in coordinates]
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(lines) + "\n")
+    partial = path.with_suffix(suffix + PARTIAL_SUFFIX)
+    partial.write_text("\n".join(lines) + "\n")
+    partial.replace(path)
     return path
 
 
