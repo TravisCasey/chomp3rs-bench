@@ -79,7 +79,7 @@ def parse(stdout, stderr, output_files):
 def skip_reason(case, config, memory_limit_bytes):
     if case.mixed_dimension:
         return "mixed-dimension input not accepted"
-    cells = dense.cell_count(case, CONSTRUCTION)
+    cells = dense.cell_count(case)
     if cells * BYTES_PER_CELL > memory_limit_bytes:
         gigabytes = memory_limit_bytes // 1024**3
         return (

@@ -189,8 +189,8 @@ def standing(entry):
 
 def convert_tier(manifest, tier_name, *, only_tool=None):
     """Convert each case once per tool, leaving alone the case a tool would
-    skip: a dense tool's grid for a case above its cap is as far out of reach
-    here as it is in the run."""
+    skip: a conversion for a case above the tool's cap is as far out of reach
+    here as the run is."""
     tier = manifest.tiers[tier_name]
     seen = set()
     for entry in plan(manifest, tier_name, only_tool, None, memory_cap(tier)):

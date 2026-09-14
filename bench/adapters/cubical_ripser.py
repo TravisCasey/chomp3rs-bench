@@ -115,7 +115,7 @@ def skip_reason(case, config, memory_limit_bytes):
         return f"dimension {case.ambient_dimension} above limit {MAXIMUM_DIMENSION}"
     if case.mixed_dimension:
         return "mixed-dimension input not accepted"
-    cells = dense.cell_count(case, CONSTRUCTION)
+    cells = dense.cell_count(case)
     if cells * BYTES_PER_CELL > memory_limit_bytes:
         gigabytes = memory_limit_bytes // 1024**3
         return (

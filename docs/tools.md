@@ -12,7 +12,7 @@ version, and the limits the adapters enforce.
 | pyCHomP2 (Shaun Harker's CHomP, Python binding) | discrete Morse theory on a dense box | `https://github.com/marciogameiro/pyCHomP2` | commit `b7b11af5fc387a6f55f42dd8fabb8d710e50d7c6` (1.1.2) | MIT | Z/2 only |
 | Perseus (Vidit Nanda) | discrete Morse theory on a cube list | `https://people.maths.ox.ac.uk/nanda/source/perseus_4_beta.zip` | 4.0 beta, sha256 `7279091080b8b6ef8d8bbcf470a76398b752f102def222a9740f2e85ad8c7925` | unstated | Z/2 only |
 | GUDHI | persistent homology of a dense grid, called as a Python module | `https://github.com/GUDHI/gudhi-devel` | release 3.13.0, tag `tags/gudhi-release-3.13.0`, commit `5dbe510bed5d8d700ec7243fd915769fb67964a2` | MIT | Z/p, p chosen |
-| DIPHA | distributed matrix reduction on a dense grid | `https://github.com/DIPHA/dipha` | commit `0b874769fbd092c07a12cebc2459adb02117c2fd` | LGPL-3.0-or-later | Z/2 only |
+| DIPHA | distributed matrix reduction of an explicit boundary matrix | `https://github.com/DIPHA/dipha` | commit `0b874769fbd092c07a12cebc2459adb02117c2fd` | LGPL-3.0-or-later | Z/2 only |
 | Cubical Ripser | Ripser's reduction adapted to a dense cubical grid | `https://github.com/shizuo-kaji/CubicalRipser` | commit `e9632f2466674c07cda0db2f178da26007194496` | LGPL-3.0-or-later, but the licence file in the repository is the GPL | Z/2 only |
 
 ## Limits the adapters enforce
@@ -50,14 +50,19 @@ version, and the limits the adapters enforce.
   side n in d dimensions, needs more than the memory cap at about 122 bytes a
   cell. It reads top cells or vertices and never a listing of faces of mixed
   dimension, so mixed-dimension cases skip it.
-- DIPHA puts its values on the grid's vertices, and the complex it builds from
-  them is not the one a list of closed top cubes means: two cubes meeting only
-  at a corner are connected in the cube list and separate in DIPHA's complex.
-  The converter therefore doubles the grid, giving a cell with base orthant b
-  and extent mask e the vertex 2b + e of a lattice of 2n + 1 points per axis,
-  which restores the intended answer. It is skipped when the complex, `(4n +
-  1)^d` cells for a case of grid side n in d dimensions, needs more than the
-  memory cap at about 82 bytes a cell.
+- DIPHA reads an explicit boundary matrix. The conversion lists the closure of
+  the case's cells, every face once at the least grade among the listed cells
+  containing it, so its cost follows the cells of the case rather than its
+  bounding box, and mixed-dimension cases are read as they are. DIPHA's image
+  input is not used: it puts values on vertices, where two cubes meeting only
+  at a corner come out separate. The case is skipped when the conversion or
+  the tool would need more than the memory cap, both bounded from the cube
+  count, dimension and bounding box. The conversion holds up to `3^d` face
+  keys per listed cell at 8 bytes per key word plus 2, one word for each 64
+  bits the doubled box coordinates need and one more for a grade, then about
+  40 bytes per closure cell. The tool takes about 94 bytes per closure cell and
+  13 per boundary entry, the closure having no more cells than those keys and
+  no more than the `(2n + 1)^d` positions of the doubled bounding box.
 - Cubical Ripser is refused above ambient dimension 4. Its own array reader
   stops there with the message that the input should be 1, 2, 3 or 4
   dimensional. It takes a dense grid with one value per top cube, so the grid

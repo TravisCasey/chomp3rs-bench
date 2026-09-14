@@ -54,9 +54,10 @@ The package installs one command, which is run as
 The numbers below were measured on a machine with 16 cores and 30 GB of memory,
 and every tier requests a 24 GB cap, which assumes a machine of about that size.
 The cap is a tier's `memory_limit_gigabytes` in `cases/manifest.toml`; set a
-smaller one there for a smaller machine. That number is also the boundary at
-which a tool needing a dense grid is skipped, so a smaller machine measures a
-smaller comparison and not merely the same one under a tighter cap.
+smaller one there for a smaller machine. That number is also what each tool's
+estimated memory for a case is checked against, and a tool that would need more
+is skipped, so a smaller machine measures a smaller comparison and not merely
+the same one under a tighter cap.
 
 ## Building the image
 

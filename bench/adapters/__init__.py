@@ -14,8 +14,8 @@ Each module defines:
 - `COEFFICIENTS`, one of `"Z/2"`, `"Z/p"` or `"Z"`.
 - `BYTES_PER_CELL`, what one cell of the complex costs a tool that builds a
   dense grid, and `None` for a tool that follows the listed cubes instead.
-- `CONSTRUCTION`, `"T"` when the tool's values sit on top-dimensional cells and
-  `"V"` when they sit on vertices, and `None` when it builds no grid.
+- `CONSTRUCTION`, `"T"` when the tool builds a dense grid whose values sit on
+  top-dimensional cells, and `None` when it builds no grid.
 - `convert(case) -> Path`, writing under `cases/converted/<NAME>/` and
   returning the file the tool reads. It is idempotent: an output newer than the
   case file is left alone. A tool that reads the canonical file returns that

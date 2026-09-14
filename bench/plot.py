@@ -51,7 +51,7 @@ from matplotlib.patches import Patch, Rectangle
 from matplotlib.ticker import FixedLocator, LogLocator, NullFormatter
 
 from bench import dense, manifest, summarize
-from bench.adapters import cubical_ripser, dipha, gudhi, pychomp2
+from bench.adapters import cubical_ripser, gudhi, pychomp2
 
 SUMMARY_DIRECTORY = Path("results/summary")
 FIGURE_DIRECTORY = Path("figures")
@@ -119,7 +119,7 @@ COVERAGE_COLORS = {
     summarize.TIMEOUT: (OKABE_ORANGE, "stopped at the timeout"),
     summarize.OUT_OF_MEMORY: (OKABE_VERMILLION, "killed at the memory cap"),
     summarize.ERROR: (INK, "ended in an error"),
-    "dense": ("#bdbcb7", "refused: dense complex over the cap"),
+    "memory": ("#bdbcb7", "refused: memory over the cap"),
     "dimension": ("#d9d8d3", "refused: dimension above the tool's limit"),
     "input": ("#ecebe7", "refused: input not accepted"),
     "absent": (SURFACE, "not run"),
@@ -129,7 +129,7 @@ COVERAGE_ORDER = (
     summarize.TIMEOUT,
     summarize.OUT_OF_MEMORY,
     summarize.ERROR,
-    "dense",
+    "memory",
     "dimension",
     "input",
     "absent",
@@ -954,7 +954,7 @@ def dense_cells(adapter, box):
     own = getattr(adapter, "complex_cells", None)
     if own is not None:
         return own(box)
-    return dense.cell_count(box, adapter.CONSTRUCTION)
+    return dense.cell_count(box)
 
 
 def skip_boundary_volume(adapter, dimension, cap_bytes):
@@ -1069,8 +1069,8 @@ def coverage_kind(row):
     if row["status"] != summarize.SKIPPED:
         return row["status"]
     reason = row["skip_reason"]
-    if reason.startswith("dense complex"):
-        return "dense"
+    if reason.endswith("GB cap"):
+        return "memory"
     if "above limit" in reason:
         return "dimension"
     return "input"
@@ -1161,7 +1161,7 @@ def draw_coverage(tables, width, label):
     return figure, ""
 
 
-DENSE_ADAPTERS = (gudhi, dipha, cubical_ripser, pychomp2)
+DENSE_ADAPTERS = (gudhi, cubical_ripser, pychomp2)
 
 FIGURES = (
     (1, "headline_flows", PAGE_WIDTH_INCHES, draw_headline_flows),
