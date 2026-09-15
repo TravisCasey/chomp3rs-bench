@@ -23,23 +23,25 @@ version, and the limits the adapters enforce.
   library keeps for one orthant is dense in 2^d. It reads the canonical file
   unchanged, grades and mixed-dimension cells included, so no case is skipped
   for its format.
-- homcubes is refused at ambient dimension 12 and above. On every case
-  measured there, the five flow covers of dimension 12, a circle, a torus and
-  a thickened curve, it ran past a 20 minute timeout under a 24 GB cap, while
-  every case of dimension 8 finished within minutes; the closure of one cube
-  has 3^d faces, and the tool builds them all. Above dimension 19 its
-  reduction stage would in any event count neighbours in a 32-bit integer that
-  overflows at 3^20 and could return a wrong reduction while appearing to
-  succeed. It has no filtration track, so graded cases skip it. The dimension
-  12 figure is a measurement from a single nightly run at a 20 minute timeout;
-  the suite as configured refuses those cases and does not repeat it.
+- homcubes is refused above ambient dimension 12, and at dimension 12 on a case
+  of more than 5,000 cubes. The closure of one cube has 3^d faces, and the tool
+  builds them all. At dimension 12 the circle of 4,690 cubes finished in 44.5
+  minutes at 5.4 GB under a 60 minute timeout, about 0.57 seconds a cube, while
+  the five flow covers of dimension 12, the torus and the longer thickened
+  curve all ran past a 20 minute timeout; 5,000 cubes is what that rate fits in
+  60 minutes. Above dimension 19 its reduction stage would in any event count
+  neighbours in a 32-bit integer that overflows at 3^20 and could return a
+  wrong reduction while appearing to succeed. It has no filtration track, so
+  graded cases skip it.
 - pyCHomP2 takes only a box with a value per cell, never a cube list, so it is
   a dense tool: it is skipped when the box would need more memory than the
   cap, at about 14 bytes per cell with 2^d cells per box position, the box
   being the case's bounding box padded by two layers along every axis. Its
   output is the cells of a connection matrix, not bars; the adapter pairs them
   itself. The box carries a value on top cubes only, so mixed-dimension cases
-  skip it.
+  skip it. It is also refused on a complex of more than 500 million cells: the
+  largest that finished held 487 million and took under four minutes, and one
+  of 1.6 billion ran past a 20 minute timeout on every repetition.
 - Perseus materialises every face of every cube, 3^d cells per cube, and no
   measured run used less than 165 bytes per such cell, so a case is skipped
   when its cube count times 3^d times 165 bytes exceeds the memory cap. That

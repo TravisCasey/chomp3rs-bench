@@ -137,8 +137,7 @@ What each tier holds beyond the smaller ones:
 
 - `smoke` is the correctness gate: one of the smaller cases of every family,
   with a graded case, a mixed-dimension case and a volume among them, a single
-  cube that measures each tool's start-up, and the `production` configuration
-  on the smallest flow cover.
+  cube, and the `production` configuration on the smallest flow cover.
 - `quick` adds a second flow cover, the circle and torus up to dimension 6, the
   smaller balls, spheres and curves, the smaller mixed-dimension cases, two
   random gradings and the downsampled volumes.
@@ -150,7 +149,7 @@ What each tier holds beyond the smaller ones:
   covers.
 - `full` adds every case left, among them the flow covers in dimension 16 and
   their stage study at 16 threads, the density sweep in dimension 6, the
-  costliest circle, torus and curve cases in dimensions 9 to 11 and those in
+  costliest circle, torus and curve cases in dimensions 9 to 12 and those in
   dimension 16, the largest mixed-dimension and random cases, the two largest
   balls and the vertebra volume at full resolution.
 
@@ -184,9 +183,9 @@ timeout.
 | Tier | Runnable | Planned | Ceiling |
 | --- | --- | --- | --- |
 | `smoke` | 72 | 85 | 72 minutes |
-| `quick` | 241 | 303 | 60 hours |
-| `nightly` | 761 | 1051 | 761 hours |
-| `full` | 975 | 1386 | 2925 hours |
+| `quick` | 240 | 303 | 60 hours |
+| `nightly` | 753 | 1016 | 753 hours |
+| `full` | 976 | 1386 | 2928 hours |
 
 ## Checking the answers
 
@@ -251,15 +250,10 @@ says what was missing, so a smaller tier yields a subset of the eleven.
 A mark on a time axis is a measurement and nothing else: a run the tier stopped
 leaves its case without a mark for that tool. On a memory axis a killed run
 reached the cap and sits on the cap line as an open marker, while a run out of
-time has no peak to draw and is absent. Every time axis carries each tool's
-start-up, its wall time on the single cube `ball_d2_r0`, as a short stroke in
-the tool's colour at the axis edge, and a case on which every tool that finished
-did so within three times its start-up is left off the figures that compare
-tools on time. An answer the check disputed is drawn inside a black ring, and a
-run that ended in an error is not drawn at all but is named in a printed line.
-Every figure's legend names the conventions that figure uses. The last figure,
-`coverage`, shows for every ungraded case of the tier which tools finished, were
-stopped, were killed, or refused it and why.
+time has no peak to draw and is absent. Every figure's legend names the
+conventions that figure uses. The last figure, `coverage`, shows for every
+ungraded case of the tier which tools finished, were stopped, were killed, or
+refused it and why.
 
 Figure 4 draws `figures/reference/table1.csv`, a transcription of Table 1(a) of
 arXiv 2105.09870, beside the suite's own sphere cases.

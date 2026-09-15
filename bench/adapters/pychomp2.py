@@ -16,6 +16,10 @@ start one, so the script pairs the connection matrix's boundary itself and reads
 a bar whose death is the absent value as never dying. The engine works over the
 integers modulo 2 only, and the construction here places top cubes in the box
 and nothing else, so mixed-dimension cases are skipped.
+
+A case is also skipped when its complex holds more than 500 million cells: the
+largest that finished held 487 million and took under four minutes, and one of
+1.6 billion ran past a 20 minute timeout on every repetition.
 """
 
 import json
@@ -30,6 +34,7 @@ ACCEPTS_MIXED_DIMENSION = False
 MAXIMUM_DIMENSION = None
 COEFFICIENTS = "Z/2"
 BYTES_PER_CELL = 14
+MAXIMUM_COMPLEX_CELLS = 500_000_000
 CONSTRUCTION = "T"
 VERSION = "commit b7b11af5fc387a6f55f42dd8fabb8d710e50d7c6 (1.1.2)"
 SCRIPT = f"{SCRIPTS_MOUNT}/pychomp2_run.py"
@@ -75,6 +80,11 @@ def skip_reason(case, config, memory_limit_bytes):
         return (
             f"dense complex of {cells} cells at {BYTES_PER_CELL} bytes each"
             f" exceeds the {gigabytes} GB cap"
+        )
+    if cells > MAXIMUM_COMPLEX_CELLS:
+        return (
+            f"dense complex of {cells} cells, over the {MAXIMUM_COMPLEX_CELLS}"
+            " past which a case ran beyond a 20 minute timeout"
         )
     return None
 
