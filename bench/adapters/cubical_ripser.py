@@ -8,11 +8,10 @@ the empty part of the box arrives last and a bar dying there has not died
 inside the case.
 
 The input format is chosen by the file's extension and by nothing else. The
-conversion writes the Perseus text grid under `.txt`: the ambient dimension on
-the first line, then one line per axis giving that axis's size in array order,
-then one value per grid position with the first axis varying fastest. A `-1` in
-such a file does not mean the grade minus one, it means the program's threshold,
-so the absent value is written as itself and never as `-1`.
+conversion writes the grid as a numpy array under `.npy`, the reader that takes
+the values in binary rather than as one text line per grid position: the
+program requires them as 64-bit floats, and reads the array's axes in order as
+its own, honouring the file's memory order.
 
 The output file `--output` names ends in `.csv` and is one bar per line, the
 dimension, the birth and the death, with the coordinates of the cells that
@@ -46,7 +45,7 @@ CONSTRUCTION = "T"
 VERSION = "commit e9632f2466674c07cda0db2f178da26007194496"
 PROGRAM = "tcubicalripser"
 CONVERTED_DIRECTORY = Path("cases/converted/cubical_ripser")
-GRID_SUFFIX = ".txt"
+GRID_SUFFIX = ".npy"
 DIAGRAM_SUFFIX = ".csv"
 PARTIAL_SUFFIX = ".part"
 LOCATION = "none"
@@ -62,14 +61,10 @@ def convert(case):
     path = CONVERTED_DIRECTORY / (case.name + GRID_SUFFIX)
     if path.exists() and path.stat().st_mtime >= case.path.stat().st_mtime:
         return path
-    values = dense.top_cell_values(case)
-    header = [str(values.ndim), *(str(side) for side in values.shape)]
-    flattened = values.ravel(order="F").astype(numpy.int64, copy=False)
     path.parent.mkdir(parents=True, exist_ok=True)
     partial = path.with_suffix(GRID_SUFFIX + PARTIAL_SUFFIX)
-    with partial.open("w") as text:
-        text.write("\n".join(header) + "\n")
-        numpy.savetxt(text, flattened, fmt="%d")
+    with partial.open("wb") as binary:
+        numpy.save(binary, dense.top_cell_values(case).astype(numpy.float64, copy=False))
     partial.replace(path)
     return path
 

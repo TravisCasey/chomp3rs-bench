@@ -15,8 +15,9 @@ each maximal cube of the case appears once, as it does in the canonical file.
 The program works over the integers modulo 2 only, with no option to choose the
 field, and reads top-dimensional cubes only, so mixed-dimension cases are
 skipped. It materialises every face of every top cube, 3^d cells each, before it
-reduces anything, so a case is skipped when one cube alone would exceed the
-memory cap.
+reduces anything, and never measured less than 165 bytes per such cell, so a
+case is skipped when its cube count times 3^d times 165 bytes exceeds the memory
+cap.
 """
 
 from pathlib import Path
@@ -41,7 +42,7 @@ MODE = "scubtop"
 BIRTH_SHIFT = 1
 NEVER_DIES = -1
 CELLS_PER_CUBE_BASE = 3
-BYTES_PER_MATERIALISED_CELL = 1400
+BYTES_PER_MATERIALISED_CELL = 165
 HOMOLOGY_PREFIX = "homology"
 PERSISTENCE_PREFIX = "persistence"
 
@@ -126,11 +127,12 @@ def bars_counted(path, track):
 def skip_reason(case, config, memory_limit_bytes):
     if case.mixed_dimension:
         return "mixed-dimension input not accepted"
-    cells = CELLS_PER_CUBE_BASE**case.ambient_dimension
+    cells = case.cube_count * CELLS_PER_CUBE_BASE**case.ambient_dimension
     if cells * BYTES_PER_MATERIALISED_CELL > memory_limit_bytes:
         gigabytes = memory_limit_bytes // 1024**3
         return (
-            f"one cube of {cells} cells at {BYTES_PER_MATERIALISED_CELL} bytes each"
-            f" exceeds the {gigabytes} GB cap"
+            f"{case.cube_count} cubes of {CELLS_PER_CUBE_BASE**case.ambient_dimension}"
+            f" cells each at {BYTES_PER_MATERIALISED_CELL} bytes a cell exceed the"
+            f" {gigabytes} GB cap"
         )
     return None

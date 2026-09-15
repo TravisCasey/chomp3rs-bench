@@ -40,10 +40,11 @@ version, and the limits the adapters enforce.
   output is the cells of a connection matrix, not bars; the adapter pairs them
   itself. The box carries a value on top cubes only, so mixed-dimension cases
   skip it.
-- Perseus materialises every face of every cube, 3^d cells per cube, so one
-  cube alone needs about 1.4 KB times 3^d. It cannot run at ambient dimension
-  16 under the suite's memory cap and is skipped there. It reads top cubes
-  only, so mixed-dimension cases skip it.
+- Perseus materialises every face of every cube, 3^d cells per cube, and no
+  measured run used less than 165 bytes per such cell, so a case is skipped
+  when its cube count times 3^d times 165 bytes exceeds the memory cap. That
+  refuses every case measured at ambient dimension 12 and above and none that
+  finished below it. It reads top cubes only, so mixed-dimension cases skip it.
 - GUDHI takes a dense grid with one value per top cube, which is the complex
   the cube list already means, so the grid needs no conversion. It is a dense
   tool: it is skipped when the complex, `(2n + 1)^d` cells for a case of grid
