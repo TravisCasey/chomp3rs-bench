@@ -242,21 +242,24 @@ uv run bench plot smoke
 ```
 
 writes `figures/<tier>/fig<NN>_<name>.pdf` and `.png`. The eleven figures are,
-in order, `headline_flows`, `ladder_d12`, `dimension_manifolds`,
+in order, `flow_ladders`, `high_dimensional_flows`, `dimension_manifolds`,
 `sphere_table1`, `density_random_top`, `mixed_dimension`, `grade_count`,
 `thread_scaling`, `memory_volume`, `published_sets` and `coverage`. A figure
 whose cases or tools the tier's tables do not hold is not drawn, and one line
 says what was missing, so a smaller tier yields a subset of the eleven.
 
-A mark on a time axis is a measurement. A run the tier stopped is drawn in a
-lane beside the axes instead, in the column or row of its case: an open marker
-for a run out of time, a cross for a run killed for memory. On a memory axis a
-killed run reached the cap and sits on the cap line as an open marker, while a
-run out of time has no peak to draw and is absent. An answer the check disputed
-is drawn inside a black ring, and a run that ended in an error is not drawn at
-all but is named in a printed line. Every figure's legend names the conventions
-that figure uses. The last figure, `coverage`, shows for every ungraded case of
-the tier which tools finished, were stopped, were killed, or refused it and why.
+A mark on a time axis is a measurement and nothing else: a run the tier stopped
+leaves its case without a mark for that tool. On a memory axis a killed run
+reached the cap and sits on the cap line as an open marker, while a run out of
+time has no peak to draw and is absent. Every time axis carries each tool's
+start-up, its wall time on the single cube `ball_d2_r0`, as a short stroke in
+the tool's colour at the axis edge, and a case on which every tool that finished
+did so within three times its start-up is left off the figures that compare
+tools on time. An answer the check disputed is drawn inside a black ring, and a
+run that ended in an error is not drawn at all but is named in a printed line.
+Every figure's legend names the conventions that figure uses. The last figure,
+`coverage`, shows for every ungraded case of the tier which tools finished, were
+stopped, were killed, or refused it and why.
 
 Figure 4 draws `figures/reference/table1.csv`, a transcription of Table 1(a) of
 arXiv 2105.09870, beside the suite's own sphere cases.

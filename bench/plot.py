@@ -11,21 +11,27 @@ the text block and a narrow one 300 pt, and no figure carries a title, the
 caption naming it instead. After every PDF is written one line prints its page
 size in points and the fonts it embeds, so a wrong width or a font that fell
 back shows in the terminal. Where a figure fixes a parameter when it is drawn,
-such as the dimension the density figure picks, the same line says which, for
-the caption to repeat.
+such as the baseline the speedups are taken over, the same line says which,
+for the caption to repeat.
 
-A mark on a time axis is a measurement. A run the tier stopped, out of time or
-killed for memory, is drawn in a lane beside the axes instead, in the column or
-row of its case, as an open marker when it ran out of time and a cross when it
-was killed; the lane appears only on a figure that has such a run. On a memory
-axis a killed run reached the cap, so it sits on the cap line as an open marker.
-A group whose repetitions ended differently is drawn at its medians with the
-marker of the worst of them, a run the tier skipped is not drawn, and a run
-that ended in an error is not drawn either but is named in a printed note. A run
-whose answer the check disputed is drawn where it landed inside a black ring.
-The legend of every figure names the conventions that figure uses, and the last
-figure, the coverage matrix, shows for every case of the tier which tools
-finished, were stopped, were killed, or refused it and why.
+A mark on a time axis is a measurement and nothing else. A run the tier stopped,
+out of time or killed for memory, leaves its case without a mark for that tool,
+and the last figure, the coverage matrix, shows for every case of the tier
+which tools finished, were stopped, were killed, or refused it and why. On a
+memory axis a killed run reached the cap, so it sits on the cap line as an open
+marker. A group whose repetitions ended differently takes the worst of their
+statuses, a run the tier skipped is not drawn, and a run that ended in an error
+is not drawn either but is named in a printed note. A run whose answer the check
+disputed is drawn where it landed inside a black ring. The legend of every
+figure names the conventions that figure uses.
+
+Every time axis carries each tool's start-up, its wall time on `ball_d2_r0`, a
+single cube, as a short stroke in the tool's colour at the edge of the axis. A
+case on which every tool that finished did so within three times its start-up
+measures starting the tools rather than their work, so the figures that compare
+tools on time leave it out; it stays in the correctness check and the coverage
+matrix. The sphere figure keeps every sphere, since its point is where the
+tools' times leave their start-up.
 
 Figure 4 reads `figures/reference/table1.csv`, the published sphere timings it
 compares against.
@@ -36,8 +42,10 @@ as `bench plot <tier>`; see `bench.cli`.
 
 import csv
 import re
+import statistics
 import zlib
 from dataclasses import dataclass
+from math import ceil
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -45,10 +53,18 @@ import matplotlib
 
 matplotlib.use("pgf")
 
+import numpy
 from matplotlib import pyplot
+from matplotlib.colors import to_hex, to_rgb
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch, Rectangle
-from matplotlib.ticker import FixedLocator, LogLocator, NullFormatter
+from matplotlib.ticker import (
+    FixedLocator,
+    FuncFormatter,
+    LogLocator,
+    NullFormatter,
+    NullLocator,
+)
 
 from bench import dense, manifest, summarize
 from bench.adapters import cubical_ripser, gudhi, pychomp2
@@ -62,6 +78,7 @@ TEXT_WIDTH_POINTS = 448.0
 PAGE_WIDTH_INCHES = TEXT_WIDTH_POINTS / POINTS_PER_INCH
 COLUMN_WIDTH_INCHES = 300.0 / POINTS_PER_INCH
 ROW_HEIGHT_INCHES = 0.28
+SERIES_HEIGHT_INCHES = 3.0
 
 FULL_CONFIG = "full"
 TIME_AXIS = "time"
@@ -104,14 +121,12 @@ TOOL_STYLE = {
 
 TOOL_ORDER = tuple(TOOL_STYLE)
 
-STAGE_ORDER = ("read", "build", "matching", "morse", "coreduction", "persistence")
-STAGE_COLORS = ("#cfe0f0", "#a9c6e4", "#7fa9d6", "#5a8bc4", "#3a6fae", "#0b3d6b")
-
 REFERENCE_COLOR = MUTED
 DISPUTED_RING_COLOR = "#000000"
-KILLED_MARKER = "x"
 DISPUTED_MARKER = "o"
 LINE_WIDTH = 0.9
+START_UP_WIDTH = 1.6
+START_UP_LENGTH = 0.035
 
 COVERAGE_COLORS = {
     summarize.FINISHED: (OKABE_BLUE, "finished"),
@@ -135,36 +150,41 @@ COVERAGE_ORDER = (
     "absent",
 )
 
-THREAD_CONFIGS = ("threads_2", "threads_4", "threads_8", "threads_16")
-MIXED_DIMENSION_SKIP = "mixed-dimension input not accepted"
-LADDER_PREFIX = "charney_devore_d12_box"
-MANIFOLD_FAMILIES = ("s1", "torus")
-PUBLISHED_FAMILY = "published"
+START_UP_CASE = "ball_d2_r0"
+START_UP_MULTIPLE = 3.0
 
-FLOW_COVERS = (
-    "lorenz_d6_box5",
-    "lorenz_d6_box2.5",
-    "lorenz_d6_box1.25",
-    "lorenz_d6_box0.5",
-    "lorenz_d6_box0.25",
-    "lorenz_d6_box0.125",
-    "dadras_d8_box24",
-    "dadras_d8_box12",
-    "dadras_d8_box6",
-    "dadras_d8_box3",
-    "charney_devore_d12_box0.05",
-    "charney_devore_d12_box0.04",
-    "charney_devore_d12_box0.03",
-    "charney_devore_d12_box0.02",
-    "charney_devore_d12_box0.01",
-    "kuramoto_sivashinsky_d16_minimal",
-    "kuramoto_sivashinsky_d16_coarse",
-    "kuramoto_sivashinsky_d16_fine",
+FLOW_LADDERS = (
+    ("lorenz_d6", "Lorenz, $d = 6$"),
+    ("dadras_d8", "Dadras, $d = 8$"),
+)
+HIGH_DIMENSIONAL_FLOWS = (
+    ("charney_devore_d12_box", "Charney-DeVore, $d = 12$, one trajectory at five box sizes", "o", True),
+    ("kuramoto_sivashinsky_d16_", "Kuramoto-Sivashinsky, $d = 16$", "s", False),
+)
+MANIFOLD_PANELS = (
+    ("circle", re.compile(r"^s1_d\d+$")),
+    ("torus", re.compile(r"^torus_d\d+$")),
+    ("curve of 2000 samples", re.compile(r"^curve_d\d+_n2000$")),
+)
+MIXED_FAMILY = "random_mixed"
+PUBLISHED_FAMILY = "published"
+PUBLISHED_SUFFIXES = ("_full", "_intensity")
+
+THREAD_CONFIGS = ("threads_1", "threads_2", "threads_4", "threads_8", "threads_16")
+SPEEDUP_BASELINES = ("threads_1", FULL_CONFIG)
+PHYSICAL_CORES = 8
+THREAD_RAMP = ("#9ecae1", "#08306b")
+
+MEMORY_GROUPS = (
+    (3, 3, "$d = 3$"),
+    (4, 8, "$d$ from 4 to 8"),
+    (9, None, "$d$ of 9 and above"),
 )
 
+LADDER_CASE = re.compile(r"^(.+)_box([0-9.]+)$")
 SPHERE_CASE = re.compile(r"^sphere_d(\d+)$")
-DENSITY_CASE = re.compile(r"^random_top_d(\d+)_p([0-9.]+)$")
-GRADED_CASE = re.compile(r"^(.+)_(?:sweep|random)_g(\d+)$")
+DENSITY_CASE = re.compile(r"^random_top_d(\d+)_side(\d+)_p([0-9.]+)_draw(\d+)$")
+GRADED_CASE = re.compile(r"^(.+)_random_g(\d+)$")
 FONT_NAME = re.compile(rb"/BaseFont\s*/(?:[A-Z]{6}\+)?([A-Za-z0-9-]+)")
 PDF_STREAM = re.compile(rb"stream\r?\n(.*?)endstream", re.S)
 
@@ -286,12 +306,36 @@ def number_of(row, column):
 
 def cross_tool_rows(tables):
     """The rows a figure comparing tools draws: one configuration per tool, the
-    chomp3rs one being `full` rather than the restricted `production`."""
+    chomp3rs one being `full`."""
     return [
         row
         for row in tables.runs
         if row["tool"] != manifest.CHOMP3RS or row["config"] == FULL_CONFIG
     ]
+
+
+def start_up_seconds(tables):
+    """Each tool's wall time on the single cube, where it finished."""
+    return {
+        row["tool"]: number_of(row, "wall_median")
+        for row in cross_tool_rows(tables)
+        if row["case"] == START_UP_CASE and row["status"] in summarize.COMPARABLE
+    }
+
+
+def timed_rows(tables):
+    """The cross-tool rows of the cases that measure work: the single cube is
+    left out, and so is every case on which each tool that finished did so
+    within `START_UP_MULTIPLE` times its start-up."""
+    floors = start_up_seconds(tables)
+    near = {}
+    for row in cross_tool_rows(tables):
+        if row["status"] in summarize.COMPARABLE and row["tool"] in floors:
+            near.setdefault(row["case"], []).append(
+                number_of(row, "wall_median") < START_UP_MULTIPLE * floors[row["tool"]]
+            )
+    left_out = {case for case, flags in near.items() if all(flags)} | {START_UP_CASE}
+    return [row for row in cross_tool_rows(tables) if row["case"] not in left_out]
 
 
 def tools_present(tables, rows, axis):
@@ -308,7 +352,7 @@ def tools_present(tables, rows, axis):
 
 
 def drawn_cases(tables, rows, axis):
-    """The cases some tool has a point for, so that a case every tool skipped
+    """The cases some tool has a point for, so that a case no tool finished
     takes no room on a categorical axis."""
     return {row["case"] for row in rows if point_of(tables, row, axis) is not None}
 
@@ -327,46 +371,23 @@ def case_label(name):
 
 def point_of(tables, row, axis):
     """Where a row sits on a time or a memory axis and which marker says how it
-    got there, or `None` where the row has nothing to say on that axis. On a
-    time axis a stopped run has no value of its own; it is drawn in the lane."""
+    got there, or `None` where the row has nothing to say on that axis."""
     status = row["status"]
-    if axis == TIME_AXIS:
-        if status == summarize.TIMEOUT:
-            return float(tables.tier.timeout_seconds), OPEN_POINT
-        if status == summarize.OUT_OF_MEMORY:
-            return number_of(row, "wall_median"), KILLED_POINT
-        if status not in summarize.COMPARABLE:
-            return None
-        return number_of(row, "wall_median"), FILLED_POINT
-    if status == summarize.OUT_OF_MEMORY:
+    if axis == MEMORY_AXIS and status == summarize.OUT_OF_MEMORY:
         return float(tables.tier.memory_limit_gigabytes), KILLED_POINT
     if status not in summarize.COMPARABLE:
         return None
+    if axis == TIME_AXIS:
+        seconds = number_of(row, "wall_median")
+        return None if seconds is None else (seconds, FILLED_POINT)
     peak = number_of(row, "peak_rss_median_kb")
     return None if peak is None else (peak / KILOBYTES_PER_GIGABYTE, FILLED_POINT)
 
 
-def needs_lane(tables, rows):
-    """Whether a time figure has a stopped run to put in a lane."""
-    return any(
-        (point := point_of(tables, row, TIME_AXIS)) is not None
-        and point[1] != FILLED_POINT
-        for row in rows
-    )
-
-
 def marker_arguments(tool, convention):
-    """How a point is drawn, which says whether it is a measurement or a run
-    the tier stopped."""
+    """How a point is drawn: filled for a measurement, open for a run the cap
+    killed, which is drawn on the cap line of a memory axis."""
     style = TOOL_STYLE[tool]
-    if convention == KILLED_POINT:
-        return {
-            "marker": KILLED_MARKER,
-            "markersize": style["size"] + 1.2,
-            "markeredgecolor": style["color"],
-            "markerfacecolor": "none",
-            "markeredgewidth": 1.2,
-        }
     if convention == OPEN_POINT:
         return {
             "marker": style["marker"],
@@ -396,11 +417,10 @@ def disputed_ring_arguments():
     }
 
 
-def plot_series(axes, lane, tables, tool, points, axis, connect, horizontal=False):
-    """One tool's points, each marked by what ended its run, joined by the tool's
-    line through the runs that finished when the axis reads as a series. A run
-    the tier stopped goes to the lane on a time axis and to the cap line on a
-    memory axis."""
+def plot_series(axes, tables, tool, points, axis, connect, horizontal=False):
+    """One tool's points, joined by the tool's line through the measurements
+    when the axis reads as a series. A run the cap killed is drawn on the cap
+    line of a memory axis and is never joined."""
     placed = []
     for position, row in points:
         point = point_of(tables, row, axis)
@@ -409,26 +429,65 @@ def plot_series(axes, lane, tables, tool, points, axis, connect, horizontal=Fals
     placed.sort(key=lambda entry: entry[0])
     joined = [entry for entry in placed if entry[2] == FILLED_POINT]
     if connect and len(joined) > 1:
+        positions = [entry[0] for entry in joined]
+        values = [entry[1] for entry in joined]
         axes.plot(
-            [entry[0] for entry in joined],
-            [entry[1] for entry in joined],
+            *((values, positions) if horizontal else (positions, values)),
             color=TOOL_STYLE[tool]["color"],
             linewidth=LINE_WIDTH,
             zorder=2,
         )
     for position, value, convention, status in placed:
-        if convention == FILLED_POINT:
-            target, where, arguments = axes, value, marker_arguments(tool, FILLED_POINT)
-        elif axis == MEMORY_AXIS:
-            target, where, arguments = axes, value, marker_arguments(tool, OPEN_POINT)
-        else:
-            target, where, arguments = lane, 0.0, marker_arguments(tool, convention)
-        coordinates = ([where], [position]) if horizontal else ([position], [where])
-        target.plot(*coordinates, linestyle="none", zorder=3, **arguments)
+        shown = OPEN_POINT if convention == KILLED_POINT else FILLED_POINT
+        coordinates = ([value], [position]) if horizontal else ([position], [value])
+        axes.plot(
+            *coordinates, linestyle="none", zorder=3, **marker_arguments(tool, shown)
+        )
         if status == summarize.DISPUTED:
-            target.plot(
+            axes.plot(
                 *coordinates, linestyle="none", zorder=4, **disputed_ring_arguments()
             )
+
+
+def draw_start_up(axes, floors, tools, horizontal=False):
+    """Each tool's start-up as a short stroke in its colour at the far edge of
+    the time axis, inside the right edge where time runs up the page and just
+    above the top where it runs across, away from the fastest marks; says
+    whether any was drawn."""
+    drawn = False
+    for tool in tools:
+        if tool not in floors:
+            continue
+        seconds = floors[tool]
+        if horizontal:
+            coordinates = ([seconds, seconds], [1.0, 1.0 + START_UP_LENGTH])
+            transform = axes.get_xaxis_transform()
+        else:
+            coordinates = ([1.0 - START_UP_LENGTH, 1.0], [seconds, seconds])
+            transform = axes.get_yaxis_transform()
+        axes.plot(
+            *coordinates,
+            transform=transform,
+            color=TOOL_STYLE[tool]["color"],
+            linewidth=START_UP_WIDTH,
+            solid_capstyle="butt",
+            clip_on=False,
+            zorder=5,
+        )
+        drawn = True
+    if drawn and not horizontal:
+        widen_right(axes, 2.5 * START_UP_LENGTH)
+    return drawn
+
+
+def widen_right(axes, share):
+    """Extend the horizontal axis to the right by `share` of its width, so that
+    no mark sits under the strokes at the right edge."""
+    low, high = axes.get_xlim()
+    if axes.get_xscale() == "log":
+        axes.set_xlim(low, high * (high / low) ** share)
+    else:
+        axes.set_xlim(low, high + (high - low) * share)
 
 
 def tool_handles(tools, with_line):
@@ -452,32 +511,29 @@ def note_handle(label, convention):
     return Line2D([], [], label=label, linestyle="none", **arguments)
 
 
-def censored_handles(tables, rows, axis):
+def convention_handles(tables, rows, axis, start_up_drawn):
     """The legend entries for the conventions this figure actually uses, so that
-    a figure without a stopped run carries no explanation of one."""
-    drawn = [point_of(tables, row, axis) for row in rows]
-    conventions = {point[1] for point in drawn if point is not None}
+    a figure without a killed run or a disputed answer carries no explanation of
+    one."""
     handles = []
-    cap = tables.tier.memory_limit_gigabytes
-    if axis == TIME_AXIS:
-        if OPEN_POINT in conventions:
+    if start_up_drawn:
+        handles.append(
+            Line2D(
+                [],
+                [],
+                label="stroke at the axis edge, in the tool's colour: its start-up on one cube",
+                color=REFERENCE_COLOR,
+                linewidth=START_UP_WIDTH,
+                solid_capstyle="butt",
+            )
+        )
+    drawn = [point_of(tables, row, axis) for row in rows]
+    if axis == MEMORY_AXIS:
+        cap = tables.tier.memory_limit_gigabytes
+        if any(point is not None and point[1] == KILLED_POINT for point in drawn):
             handles.append(
                 note_handle(
-                    f"open marker in the lane: stopped at the"
-                    f" {tables.tier.timeout_seconds} s timeout",
-                    OPEN_POINT,
-                )
-            )
-        if KILLED_POINT in conventions:
-            handles.append(
-                note_handle(f"cross in the lane: killed at the {cap} GB cap", KILLED_POINT)
-            )
-    else:
-        if KILLED_POINT in conventions:
-            handles.append(
-                note_handle(
-                    f"open marker on the cap line: killed at the {cap} GB cap",
-                    OPEN_POINT,
+                    f"open marker on the cap line: killed at the {cap} GB cap", OPEN_POINT
                 )
             )
         if any(row["status"] == summarize.TIMEOUT for row in rows):
@@ -509,7 +565,7 @@ def censored_handles(tables, rows, axis):
     return handles
 
 
-def log_scale(axes, which):
+def log_scale(axes, which, numticks=12):
     """A logarithmic axis labelled at the decades, with unlabelled minor ticks
     at 2, 3 and 5."""
     if which == "x":
@@ -518,9 +574,22 @@ def log_scale(axes, which):
     else:
         axes.set_yscale("log")
         axis = axes.yaxis
-    axis.set_major_locator(LogLocator(base=10.0, numticks=12))
+    axis.set_major_locator(LogLocator(base=10.0, numticks=numticks))
     axis.set_minor_locator(LogLocator(base=10.0, subs=(2.0, 3.0, 5.0), numticks=20))
     axis.set_minor_formatter(NullFormatter())
+
+
+def label_narrow_log(axes, which):
+    """Label the minor ticks too, as plain numbers, where a logarithmic axis
+    spans less than two decades and would otherwise carry one label or none."""
+    low, high = axes.get_xlim() if which == "x" else axes.get_ylim()
+    low, high = sorted((low, high))
+    if low <= 0 or high / low >= 100:
+        return
+    axis = axes.xaxis if which == "x" else axes.yaxis
+    plain = FuncFormatter(lambda value, _: f"{value:g}")
+    axis.set_major_formatter(plain)
+    axis.set_minor_formatter(plain)
 
 
 def integer_ticks(axes, values):
@@ -559,63 +628,17 @@ def finish_figure(figure, series, notes, width, chosen=""):
     return figure, chosen
 
 
-def style_lane(lane, horizontal):
-    """The lane that holds the runs the tier stopped: shaded, unscaled, and
-    labelled once."""
-    lane.set_facecolor(BAND)
-    lane.grid(False)
-    for spine in lane.spines.values():
-        spine.set_visible(False)
-    lane.tick_params(axis="both", length=0)
-    if horizontal:
-        lane.set_xlim(-1.0, 1.0)
-        lane.set_xticks([0.0])
-        lane.set_xticklabels(["did not\nfinish"])
-    else:
-        lane.set_ylim(-1.0, 1.0)
-        lane.set_yticks([0.0])
-        lane.set_yticklabels(["did not finish"])
-
-
-def series_panels(width, height, columns, lane, share_y=False):
-    """The axes of a figure whose time axis is vertical, one panel per column,
-    each under its own lane when the figure has a stopped run to show."""
-    if lane:
-        figure, panels = pyplot.subplots(
-            2,
-            columns,
-            figsize=(width, height),
-            squeeze=False,
-            height_ratios=(1, 8),
-            sharex="col",
-            sharey="row" if share_y else False,
-        )
-        for panel in panels[0]:
-            style_lane(panel, horizontal=False)
-        return figure, list(panels[1]), list(panels[0])
+def series_panels(width, height, columns, share_y=False):
+    """The axes of a figure whose values run up the page, one panel per column."""
     figure, panels = pyplot.subplots(
         1, columns, figsize=(width, height), squeeze=False, sharey=share_y
     )
-    return figure, list(panels[0]), [None] * columns
+    return figure, list(panels[0])
 
 
-def rows_panel(width, height, lane):
-    """The axes of a figure with one row per case and time running across,
-    with the lane to its right when the figure has a stopped run to show."""
-    if lane:
-        figure, panels = pyplot.subplots(
-            1, 2, figsize=(width, height), squeeze=False, width_ratios=(9, 1), sharey=True
-        )
-        style_lane(panels[0][1], horizontal=True)
-        return figure, panels[0][0], panels[0][1]
-    figure, axes = pyplot.subplots(figsize=(width, height))
-    return figure, axes, None
-
-
-def plot_rows(figure_parts, tables, rows, names, tools):
+def plot_rows(axes, tables, rows, names, tools):
     """One row per case, the tools spread along the time axis of that row, for
     a set of cases that has no measure to put them in order along."""
-    figure, axes, lane = figure_parts
     positions = {name: index for index, name in enumerate(names)}
     for index in range(0, len(names), 2):
         axes.axhspan(index - 0.5, index + 0.5, color=BAND, linewidth=0, zorder=0)
@@ -625,7 +648,7 @@ def plot_rows(figure_parts, tables, rows, names, tools):
             for row in rows
             if row["tool"] == tool and row["case"] in positions
         ]
-        plot_series(axes, lane, tables, tool, points, TIME_AXIS, False, horizontal=True)
+        plot_series(axes, tables, tool, points, TIME_AXIS, False, horizontal=True)
     log_scale(axes, "x")
     axes.grid(axis="y", visible=False)
     axes.grid(axis="x", visible=True)
@@ -641,82 +664,195 @@ def rows_height(names):
     return ROW_HEIGHT_INCHES * len(names) + 0.9
 
 
-def draw_headline_flows(tables, width, label):
-    rows = [row for row in cross_tool_rows(tables) if row["case"] in FLOW_COVERS]
-    note_errors(label, rows)
-    tools = tools_present(tables, rows, TIME_AXIS)
-    if not tools:
-        return "no measured run on a flow cover in the tables"
-    measured = drawn_cases(tables, rows, TIME_AXIS)
-    names = [name for name in FLOW_COVERS if name in measured]
-    parts = rows_panel(width, rows_height(names), needs_lane(tables, rows))
-    plot_rows(parts, tables, rows, names, tools)
+def draw_rows_figure(tables, width, rows, names, tools):
+    figure, axes = pyplot.subplots(figsize=(width, rows_height(names)))
+    plot_rows(axes, tables, rows, names, tools)
+    start_up_drawn = draw_start_up(
+        axes, start_up_seconds(tables), tools, horizontal=True
+    )
     return finish_figure(
-        parts[0], tool_handles(tools, False), censored_handles(tables, rows, TIME_AXIS), width
+        figure,
+        tool_handles(tools, False),
+        convention_handles(tables, rows, TIME_AXIS, start_up_drawn),
+        width,
     )
 
 
-def draw_ladder_d12(tables, width, label):
+def draw_flow_ladders(tables, width, label):
+    """Wall time against cube count on the Lorenz and Dadras covers, each one
+    trajectory at several box sizes, one panel per system."""
+    prefixes = dict(FLOW_LADDERS)
     rows = [
-        row for row in cross_tool_rows(tables) if row["case"].startswith(LADDER_PREFIX)
+        row
+        for row in timed_rows(tables)
+        if (match := LADDER_CASE.match(row["case"])) and match.group(1) in prefixes
     ]
     note_errors(label, rows)
-    tools = tools_present(tables, rows, TIME_AXIS)
-    if not tools:
-        return "no measured run on the Charney-DeVore ladder in the tables"
-    figure, (axes,), (lane,) = series_panels(width, 3.0, 1, needs_lane(tables, rows))
-    for tool in tools:
-        points = [
-            (number_of(row, "cube_count"), row) for row in rows if row["tool"] == tool
+    panels = [
+        (prefix, title)
+        for prefix, title in FLOW_LADDERS
+        if drawn_cases(
+            tables,
+            [row for row in rows if LADDER_CASE.match(row["case"]).group(1) == prefix],
+            TIME_AXIS,
+        )
+    ]
+    if not panels:
+        return "no measured run on the Lorenz or Dadras covers in the tables"
+    floors = start_up_seconds(tables)
+    figure, axes_list = series_panels(
+        width, SERIES_HEIGHT_INCHES, len(panels), share_y=True
+    )
+    start_up_drawn = False
+    for axes, (prefix, title) in zip(axes_list, panels):
+        panel_rows = [
+            row for row in rows if LADDER_CASE.match(row["case"]).group(1) == prefix
         ]
-        plot_series(axes, lane, tables, tool, points, TIME_AXIS, connect=True)
+        panel_tools = tools_present(tables, panel_rows, TIME_AXIS)
+        for tool in panel_tools:
+            points = [
+                (number_of(row, "cube_count"), row)
+                for row in panel_rows
+                if row["tool"] == tool
+            ]
+            plot_series(axes, tables, tool, points, TIME_AXIS, connect=True)
+        log_scale(axes, "x")
+        log_scale(axes, "y")
+        label_narrow_log(axes, "x")
+        axes.set_xlabel(f"cubes in the cover, {title}")
+        start_up_drawn |= draw_start_up(axes, floors, panel_tools)
+    axes_list[0].set_ylabel("wall time (s)")
+    return finish_figure(
+        figure,
+        tool_handles(tools_present(tables, rows, TIME_AXIS), True),
+        convention_handles(tables, rows, TIME_AXIS, start_up_drawn),
+        width,
+    )
+
+
+def draw_high_dimensional_flows(tables, width, label):
+    """CHomP3-rs alone on the flow covers of dimension 12 and 16, which no
+    competing tool finishes: wall time against cube count."""
+    prefixes = tuple(prefix for prefix, *_ in HIGH_DIMENSIONAL_FLOWS)
+    rows = [
+        row
+        for row in tables.runs
+        if row["tool"] == manifest.CHOMP3RS
+        and row["config"] == FULL_CONFIG
+        and row["case"].startswith(prefixes)
+    ]
+    note_errors(label, rows)
+    groups = []
+    for prefix, title, marker, connect in HIGH_DIMENSIONAL_FLOWS:
+        points = sorted(
+            (number_of(row, "cube_count"), number_of(row, "wall_median"), row["status"])
+            for row in rows
+            if row["case"].startswith(prefix) and row["status"] in summarize.COMPARABLE
+        )
+        if points:
+            groups.append((title, marker, connect, points))
+    if not groups:
+        return "no measured CHomP3-rs run on the flow covers of dimension 12 or 16"
+    figure, (axes,) = series_panels(width, SERIES_HEIGHT_INCHES, 1)
+    series = []
+    for title, marker, connect, points in groups:
+        if connect and len(points) > 1:
+            axes.plot(
+                [point[0] for point in points],
+                [point[1] for point in points],
+                color="#000000",
+                linewidth=LINE_WIDTH,
+                zorder=2,
+            )
+        for cubes, seconds, status in points:
+            axes.plot(
+                [cubes],
+                [seconds],
+                linestyle="none",
+                marker=marker,
+                markersize=5.0,
+                markerfacecolor="#000000",
+                markeredgecolor=SURFACE,
+                markeredgewidth=0.5,
+                zorder=3,
+            )
+            if status == summarize.DISPUTED:
+                axes.plot(
+                    [cubes], [seconds], linestyle="none", zorder=4, **disputed_ring_arguments()
+                )
+        series.append(
+            Line2D(
+                [],
+                [],
+                label=title,
+                color="#000000",
+                linestyle="-" if connect else "none",
+                linewidth=LINE_WIDTH,
+                marker=marker,
+                markersize=5.0,
+                markerfacecolor="#000000",
+                markeredgecolor=SURFACE,
+            )
+        )
     log_scale(axes, "x")
     log_scale(axes, "y")
+    label_narrow_log(axes, "x")
+    label_narrow_log(axes, "y")
     axes.set_xlabel("cubes in the cover")
     axes.set_ylabel("wall time (s)")
     return finish_figure(
-        figure, tool_handles(tools, True), censored_handles(tables, rows, TIME_AXIS), width
+        figure, series, convention_handles(tables, rows, TIME_AXIS, False), width
     )
 
 
 def draw_dimension_manifolds(tables, width, label):
     rows = [
         row
-        for row in cross_tool_rows(tables)
-        if row["family"] in MANIFOLD_FAMILIES and row["graded"] == "false"
+        for row in timed_rows(tables)
+        if row["graded"] == "false"
+        and any(pattern.match(row["case"]) for _, pattern in MANIFOLD_PANELS)
     ]
     note_errors(label, rows)
-    tools = tools_present(tables, rows, TIME_AXIS)
-    if not tools:
-        return "no measured run on an ungraded s1 or torus case in the tables"
-    families = [
-        family
-        for family in MANIFOLD_FAMILIES
-        if any(row["family"] == family for row in rows)
+    panels = [
+        (title, pattern)
+        for title, pattern in MANIFOLD_PANELS
+        if drawn_cases(
+            tables, [row for row in rows if pattern.match(row["case"])], TIME_AXIS
+        )
     ]
-    figure, panels, lanes = series_panels(
-        width, 3.0, len(families), needs_lane(tables, rows), share_y=True
+    if not panels:
+        return "no measured run on an ungraded circle, torus or curve case in the tables"
+    floors = start_up_seconds(tables)
+    figure, axes_list = series_panels(
+        width, SERIES_HEIGHT_INCHES, len(panels), share_y=True
     )
-    for axes, lane, family in zip(panels, lanes, families):
+    start_up_drawn = False
+    for axes, (title, pattern) in zip(axes_list, panels):
+        panel_rows = [row for row in rows if pattern.match(row["case"])]
+        panel_tools = tools_present(tables, panel_rows, TIME_AXIS)
         dimensions = []
-        for tool in tools:
+        for tool in panel_tools:
             points = [
                 (number_of(row, "ambient_dimension"), row)
-                for row in rows
-                if row["tool"] == tool and row["family"] == family
+                for row in panel_rows
+                if row["tool"] == tool
             ]
             dimensions += [
                 position
                 for position, row in points
                 if point_of(tables, row, TIME_AXIS) is not None
             ]
-            plot_series(axes, lane, tables, tool, points, TIME_AXIS, connect=True)
+            plot_series(axes, tables, tool, points, TIME_AXIS, connect=True)
         log_scale(axes, "y")
         integer_ticks(axes, dimensions)
-        axes.set_xlabel(f"ambient dimension $d$, {family}")
-    panels[0].set_ylabel("wall time (s)")
+        axes.set_xlabel(f"ambient dimension $d$\n{title}")
+        start_up_drawn |= draw_start_up(axes, floors, panel_tools)
+    axes_list[0].set_ylabel("wall time (s)")
     return finish_figure(
-        figure, tool_handles(tools, True), censored_handles(tables, rows, TIME_AXIS), width
+        figure,
+        tool_handles(tools_present(tables, rows, TIME_AXIS), True),
+        convention_handles(tables, rows, TIME_AXIS, start_up_drawn),
+        width,
     )
 
 
@@ -733,14 +869,15 @@ def draw_sphere_table1(tables, width, label):
     """The sphere_d<k> cases beside the published times for the same complex.
     Each sphere_d<k> case lists the 2d facets of the d-cube and the complex is
     their closure, which is the paper's S^d: the two sides compute the same
-    3^d - 1 cells, so the times compare directly."""
+    3^d - 1 cells. The published times are taken inside one process, so
+    CHomP3-rs's own stage total is drawn beside its wall time."""
     rows = [row for row in cross_tool_rows(tables) if SPHERE_CASE.match(row["case"])]
     note_errors(label, rows)
     tools = tools_present(tables, rows, TIME_AXIS)
     if not tools:
         return "no measured run on a sphere case in the tables"
     reference = read_rows(REFERENCE_TABLE)
-    figure, (axes,), (lane,) = series_panels(width, 3.0, 1, needs_lane(tables, rows))
+    figure, (axes,) = series_panels(width, SERIES_HEIGHT_INCHES, 1)
     dimensions = [float(entry["dimension"]) for entry in reference]
     for tool in tools:
         points = [
@@ -753,208 +890,307 @@ def draw_sphere_table1(tables, width, label):
             for position, row in points
             if point_of(tables, row, TIME_AXIS) is not None
         ]
-        plot_series(axes, lane, tables, tool, points, TIME_AXIS, connect=True)
+        plot_series(axes, tables, tool, points, TIME_AXIS, connect=True)
+    own = {}
+    for row in tables.stages:
+        match = SPHERE_CASE.match(row["case"])
+        if match and row["config"] == FULL_CONFIG:
+            dimension = float(match.group(1))
+            own[dimension] = own.get(dimension, 0.0) + float(row["seconds_median"])
+    stage_style = {
+        "color": "#000000",
+        "linestyle": (0, (1.0, 1.5)),
+        "linewidth": LINE_WIDTH,
+        "marker": "o",
+        "markersize": 4.0,
+        "markerfacecolor": SURFACE,
+        "markeredgecolor": "#000000",
+        "markeredgewidth": 0.8,
+    }
+    if own:
+        ordered = sorted(own)
+        axes.plot(ordered, [own[dimension] for dimension in ordered], zorder=2, **stage_style)
+    reference_style = {
+        "color": REFERENCE_COLOR,
+        "linestyle": (0, (2.0, 1.5)),
+        "linewidth": LINE_WIDTH,
+        "marker": "+",
+        "markersize": 5.0,
+    }
     axes.plot(
         [float(entry["dimension"]) for entry in reference],
         [elapsed_seconds(entry["time_elapsed"]) for entry in reference],
-        color=REFERENCE_COLOR,
-        linestyle=(0, (2.0, 1.5)),
-        linewidth=LINE_WIDTH,
-        marker="+",
-        markersize=5.0,
         zorder=2,
+        **reference_style,
     )
     log_scale(axes, "y")
     integer_ticks(axes, dimensions)
-    axes.xaxis.set_major_locator(FixedLocator([d for d in sorted(set(dimensions)) if d % 2 == 0]))
-    axes.set_xticklabels([str(int(d)) for d in sorted(set(dimensions)) if d % 2 == 0])
+    even = [value for value in sorted(set(dimensions)) if value % 2 == 0]
+    axes.xaxis.set_major_locator(FixedLocator(even))
+    axes.set_xticklabels([str(int(value)) for value in even])
     axes.set_xlabel("ambient dimension $d$")
     axes.set_ylabel("wall time (s)")
+    start_up_drawn = draw_start_up(axes, start_up_seconds(tables), tools)
     series = tool_handles(tools, True)
-    series.append(
-        Line2D(
-            [],
-            [],
-            label="arXiv:2105.09870 Table 1(a), one core",
-            color=REFERENCE_COLOR,
-            linestyle=(0, (2.0, 1.5)),
-            linewidth=LINE_WIDTH,
-            marker="+",
-            markersize=5.0,
+    if own:
+        series.append(
+            Line2D([], [], label="CHomP3-rs, its stages alone, without start-up", **stage_style)
         )
+    series.append(
+        Line2D([], [], label="arXiv:2105.09870 Table 1(a), one core", **reference_style)
     )
-    return finish_figure(figure, series, censored_handles(tables, rows, TIME_AXIS), width)
+    return finish_figure(
+        figure,
+        series,
+        convention_handles(tables, rows, TIME_AXIS, start_up_drawn),
+        width,
+    )
+
+
+def draw_spread(axes, tables, tool, entries):
+    """One tool's median over the draws at each density, joined across the
+    densities, with a stroke from the least to the greatest draw; a density at
+    which no draw finished has no mark."""
+    by_density = {}
+    disputed = set()
+    for density, row in entries:
+        point = point_of(tables, row, TIME_AXIS)
+        if point is None:
+            continue
+        by_density.setdefault(density, []).append(point[0])
+        if row["status"] == summarize.DISPUTED:
+            disputed.add(density)
+    densities = sorted(by_density)
+    medians = [statistics.median(by_density[density]) for density in densities]
+    color = TOOL_STYLE[tool]["color"]
+    if len(densities) > 1:
+        axes.plot(densities, medians, color=color, linewidth=LINE_WIDTH, zorder=2)
+    for density, median in zip(densities, medians):
+        values = by_density[density]
+        axes.plot(
+            [density, density], [min(values), max(values)], color=color, linewidth=0.8, zorder=2
+        )
+        axes.plot(
+            [density], [median], linestyle="none", zorder=3, **marker_arguments(tool, FILLED_POINT)
+        )
+        if density in disputed:
+            axes.plot(
+                [density], [median], linestyle="none", zorder=4, **disputed_ring_arguments()
+            )
 
 
 def draw_density_random_top(tables, width, label):
-    matched = [
-        (DENSITY_CASE.match(row["case"]), row) for row in cross_tool_rows(tables)
-    ]
-    note_errors(label, [row for match, row in matched if match is not None])
-    by_dimension = {}
-    for match, row in matched:
-        if match is None:
-            continue
-        by_dimension.setdefault(int(match.group(1)), []).append(
-            (float(match.group(2)), row)
-        )
-    if not by_dimension:
-        return "no random_top case in the tables"
-    measured = {
-        value: {
-            density
-            for density, row in entries
-            if point_of(tables, row, TIME_AXIS) is not None
-        }
-        for value, entries in by_dimension.items()
-    }
-    dimension = max(measured, key=lambda value: (len(measured[value]), value))
-    points = by_dimension[dimension]
-    rows = [row for _, row in points]
-    tools = tools_present(tables, rows, TIME_AXIS)
-    if not tools:
-        return "no measured run on a random_top case in the tables"
-    figure, (axes,), (lane,) = series_panels(width, 3.0, 1, needs_lane(tables, rows))
-    for tool in tools:
-        plot_series(
-            axes,
-            lane,
-            tables,
-            tool,
-            [(density, row) for density, row in points if row["tool"] == tool],
-            TIME_AXIS,
-            connect=True,
-        )
-    log_scale(axes, "y")
-    densities = sorted({density for density, _ in points})
-    axes.xaxis.set_major_locator(FixedLocator(densities))
-    axes.set_xticklabels([f"{density:g}" for density in densities])
-    axes.set_xlabel("share of box positions holding a cube, $p$")
-    axes.set_ylabel("wall time (s)")
+    """Wall time against the share of box positions holding a cube, one panel
+    per dimension of the sweep, each point the median over the draws."""
+    groups = {}
+    draws = set()
+    for row in cross_tool_rows(tables):
+        match = DENSITY_CASE.match(row["case"])
+        if match:
+            key = (int(match.group(1)), int(match.group(2)))
+            groups.setdefault(key, []).append((float(match.group(3)), row))
+            draws.add(int(match.group(4)))
+    note_errors(label, [row for entries in groups.values() for _, row in entries])
+    panels = sorted(
+        key
+        for key, entries in groups.items()
+        if drawn_cases(tables, [row for _, row in entries], TIME_AXIS)
+    )
+    if not panels:
+        return "no measured run on a random_top density sweep in the tables"
+    floors = start_up_seconds(tables)
+    rows = [row for key in panels for _, row in groups[key]]
+    figure, axes_list = series_panels(width, SERIES_HEIGHT_INCHES, len(panels))
+    start_up_drawn = False
+    for axes, (dimension, side) in zip(axes_list, panels):
+        entries = groups[(dimension, side)]
+        panel_tools = tools_present(tables, [row for _, row in entries], TIME_AXIS)
+        for tool in panel_tools:
+            draw_spread(
+                axes,
+                tables,
+                tool,
+                [(density, row) for density, row in entries if row["tool"] == tool],
+            )
+        log_scale(axes, "y")
+        densities = sorted({density for density, _ in entries})
+        axes.xaxis.set_major_locator(FixedLocator(densities))
+        axes.set_xticklabels([f"{density:g}" for density in densities])
+        axes.set_xlabel(f"share of positions holding a cube\n$d = {dimension}$, side {side}")
+        start_up_drawn |= draw_start_up(axes, floors, panel_tools)
+    axes_list[0].set_ylabel("wall time (s)")
     return finish_figure(
         figure,
-        tool_handles(tools, True),
-        censored_handles(tables, rows, TIME_AXIS),
+        tool_handles(tools_present(tables, rows, TIME_AXIS), True),
+        convention_handles(tables, rows, TIME_AXIS, start_up_drawn),
         width,
-        chosen=f", drawn at d = {dimension}",
+        chosen=f", each point the median and range over {len(draws)} draws",
     )
 
 
 def draw_mixed_dimension(tables, width, label):
-    refused = {
-        row["case"] for row in tables.runs if row["skip_reason"] == MIXED_DIMENSION_SKIP
-    }
     rows = [
         row
-        for row in cross_tool_rows(tables)
-        if row["case"] in refused and row["status"] != summarize.SKIPPED
+        for row in timed_rows(tables)
+        if row["family"] == MIXED_FAMILY and row["status"] != summarize.SKIPPED
     ]
     note_errors(label, rows)
     tools = tools_present(tables, rows, TIME_AXIS)
     if not tools:
-        return "no measured run on a mixed-dimension case in the tables"
+        return "no measured run on a random mixed-dimension case in the tables"
     shape_of = {
-        row["case"]: (row["family"], number_of(row, "ambient_dimension"))
+        row["case"]: (number_of(row, "ambient_dimension"), number_of(row, "cube_count"))
         for row in rows
     }
     names = sorted(
-        drawn_cases(tables, rows, TIME_AXIS),
-        key=lambda name: shape_of[name] + (name,),
+        drawn_cases(tables, rows, TIME_AXIS), key=lambda name: shape_of[name] + (name,)
     )
-    parts = rows_panel(width, rows_height(names), needs_lane(tables, rows))
-    plot_rows(parts, tables, rows, names, tools)
-    return finish_figure(
-        parts[0], tool_handles(tools, False), censored_handles(tables, rows, TIME_AXIS), width
-    )
+    return draw_rows_figure(tables, width, rows, names, tools)
 
 
 def draw_grade_count(tables, width, label):
+    """Wall time against the number of grades on the randomly graded cases, one
+    panel per case graded at more than one count."""
     by_base = {}
     for row in cross_tool_rows(tables):
         match = GRADED_CASE.match(row["case"])
-        if match is None or row["graded"] != "true":
-            continue
-        by_base.setdefault(match.group(1), []).append(row)
+        if match and row["graded"] == "true":
+            by_base.setdefault(match.group(1), []).append(row)
     note_errors(label, [row for group in by_base.values() for row in group])
-    if not by_base:
-        return "no graded case in the tables"
-    measured = {
-        name: {
-            row["grade_count"]
-            for row in group
-            if point_of(tables, row, TIME_AXIS) is not None
-        }
-        for name, group in by_base.items()
-    }
-    base = max(measured, key=lambda name: len(measured[name]))
-    if len(measured[base]) < 2:
-        return "fewer than two grade counts measured on any graded case in the tables"
-    rows = by_base[base]
-    tools = tools_present(tables, rows, TIME_AXIS)
-    figure, (axes,), (lane,) = series_panels(width, 3.0, 1, needs_lane(tables, rows))
-    for tool in tools:
-        points = [
-            (number_of(row, "grade_count"), row) for row in rows if row["tool"] == tool
-        ]
-        plot_series(axes, lane, tables, tool, points, TIME_AXIS, connect=True)
-    counts = sorted({number_of(row, "grade_count") for row in rows})
-    axes.set_xscale("log", base=2)
-    axes.xaxis.set_major_locator(FixedLocator(counts))
-    axes.set_xticklabels([str(int(count)) for count in counts])
-    axes.xaxis.set_minor_locator(FixedLocator([]))
-    log_scale(axes, "y")
-    axes.set_xlabel("grades in the filtration")
-    axes.set_ylabel("wall time (s)")
+    bases = sorted(
+        base
+        for base, group in by_base.items()
+        if len(
+            {
+                row["grade_count"]
+                for row in group
+                if point_of(tables, row, TIME_AXIS) is not None
+            }
+        )
+        >= 2
+    )
+    if not bases:
+        return "fewer than two grade counts measured on any randomly graded case"
+    floors = start_up_seconds(tables)
+    rows = [row for base in bases for row in by_base[base]]
+    figure, axes_list = series_panels(width, SERIES_HEIGHT_INCHES, len(bases))
+    start_up_drawn = False
+    for axes, base in zip(axes_list, bases):
+        group = by_base[base]
+        panel_tools = tools_present(tables, group, TIME_AXIS)
+        for tool in panel_tools:
+            points = [
+                (number_of(row, "grade_count"), row) for row in group if row["tool"] == tool
+            ]
+            plot_series(axes, tables, tool, points, TIME_AXIS, connect=True)
+        counts = sorted({number_of(row, "grade_count") for row in group})
+        axes.set_xscale("log")
+        axes.xaxis.set_major_locator(FixedLocator(counts))
+        axes.set_xticklabels(
+            [str(int(count)) for count in counts],
+            rotation=35,
+            ha="right",
+            rotation_mode="anchor",
+        )
+        axes.xaxis.set_minor_locator(NullLocator())
+        log_scale(axes, "y")
+        axes.set_xlabel(f"grades in the filtration\n{case_label(base)}")
+        start_up_drawn |= draw_start_up(axes, floors, panel_tools)
+    axes_list[0].set_ylabel("wall time (s)")
     return finish_figure(
         figure,
-        tool_handles(tools, True),
-        censored_handles(tables, rows, TIME_AXIS),
+        tool_handles(tools_present(tables, rows, TIME_AXIS), True),
+        convention_handles(tables, rows, TIME_AXIS, start_up_drawn),
         width,
-        chosen=f", drawn on {base}",
     )
 
 
+def color_ramp(count):
+    """`count` shades of one blue, light to dark."""
+    start, end = (numpy.array(to_rgb(color)) for color in THREAD_RAMP)
+    return [
+        to_hex(start + (end - start) * (index / max(1, count - 1)))
+        for index in range(count)
+    ]
+
+
 def draw_thread_scaling(tables, width, label):
-    note_errors(label, [row for row in tables.runs if row["config"] in THREAD_CONFIGS])
-    threaded = {row["case"] for row in tables.stages if row["config"] in THREAD_CONFIGS}
-    if not threaded:
-        return "no chomp3rs thread configuration in the stage table"
-    sequential = {}
-    for row in tables.stages:
-        if row["case"] in threaded and row["config"] == FULL_CONFIG:
-            sequential[row["case"]] = sequential.get(row["case"], 0.0) + float(
-                row["seconds_median"]
-            )
-    case = max(sequential, key=sequential.get)
-    configs = [FULL_CONFIG, *THREAD_CONFIGS]
-    seconds = {}
-    for row in tables.stages:
-        if row["case"] == case and row["config"] in configs:
-            seconds[(row["config"], row["stage"])] = float(row["seconds_median"])
-    drawn = [config for config in configs if any(key[0] == config for key in seconds)]
-    positions = range(len(drawn))
-    figure, axes = pyplot.subplots(figsize=(width, 3.0))
-    bottoms = [0.0] * len(drawn)
-    for stage, color in zip(STAGE_ORDER, STAGE_COLORS):
-        heights = [seconds.get((config, stage), 0.0) for config in drawn]
-        axes.bar(
-            positions,
-            heights,
-            bottom=bottoms,
-            width=0.68,
-            color=color,
-            edgecolor=SURFACE,
-            linewidth=0.8,
-            label=stage,
-        )
-        bottoms = [bottom + height for bottom, height in zip(bottoms, heights)]
-    axes.set_xticks(positions)
-    axes.set_xticklabels([str(tables.configs[config]["threads"]) for config in drawn])
-    axes.set_xlabel("threads (1 is the sequential backend)")
-    axes.set_ylabel("wall time per stage (s)")
-    axes.grid(axis="x", visible=False)
-    stages, _ = axes.get_legend_handles_labels()
-    return finish_figure(figure, stages[::-1], [], width, chosen=f", drawn on {case}")
+    """CHomP3-rs's speedup against thread count, one line per case of the
+    thread sweep, darker for a case whose one-thread run is longer."""
+    note_errors(
+        label,
+        [
+            row
+            for row in tables.runs
+            if row["tool"] == manifest.CHOMP3RS and row["config"] in THREAD_CONFIGS
+        ],
+    )
+    seconds = {
+        (row["case"], row["config"]): number_of(row, "wall_median")
+        for row in tables.runs
+        if row["tool"] == manifest.CHOMP3RS
+        and row["config"] in (*THREAD_CONFIGS, FULL_CONFIG)
+        and row["status"] in summarize.COMPARABLE
+    }
+    threaded = {case for case, config in seconds if config in THREAD_CONFIGS[1:]}
+    baselines = {}
+    for case in threaded:
+        for config in SPEEDUP_BASELINES:
+            if (case, config) in seconds:
+                baselines[case] = (config, seconds[(case, config)])
+                break
+    cases = sorted(baselines, key=lambda case: baselines[case][1])
+    if not cases:
+        return "no CHomP3-rs thread configuration with a baseline in the tables"
+    counts = [tables.configs[config]["threads"] for config in THREAD_CONFIGS]
+    handles = []
+    lines = []
+    for case, color in zip(cases, color_ramp(len(cases))):
+        config, baseline = baselines[case]
+        points = [
+            (tables.configs[threads]["threads"], baseline / seconds[(case, threads)])
+            for threads in THREAD_CONFIGS
+            if (case, threads) in seconds
+        ]
+        style = {
+            "color": color,
+            "linewidth": LINE_WIDTH,
+            "marker": "o",
+            "markersize": 4.0,
+            "markerfacecolor": color,
+            "markeredgecolor": SURFACE,
+            "markeredgewidth": 0.5,
+        }
+        lines.append((points, style))
+        handles.append(Line2D([], [], label=case_label(case), **style))
+    height = SERIES_HEIGHT_INCHES + 0.2 * ceil(len(handles) / legend_columns(handles, width))
+    figure, (axes,) = series_panels(width, height, 1)
+    for points, style in lines:
+        axes.plot([point[0] for point in points], [point[1] for point in points], zorder=3, **style)
+    ideal = {"color": REFERENCE_COLOR, "linestyle": (0, (4.0, 2.0)), "linewidth": LINE_WIDTH}
+    cores = {"color": REFERENCE_COLOR, "linestyle": (0, (1.0, 2.0)), "linewidth": 0.9}
+    axes.plot(counts, counts, zorder=1, **ideal)
+    axes.axvline(PHYSICAL_CORES, zorder=1, **cores)
+    plain = FuncFormatter(lambda value, _: f"{value:g}")
+    for axis, scale in ((axes.xaxis, axes.set_xscale), (axes.yaxis, axes.set_yscale)):
+        scale("log", base=2)
+        axis.set_major_locator(FixedLocator(counts))
+        axis.set_major_formatter(plain)
+        axis.set_minor_locator(NullLocator())
+    axes.grid(axis="x", visible=True)
+    axes.set_xlabel("threads")
+    axes.set_ylabel("speedup")
+    notes = [
+        Line2D([], [], label="dashed: speedup equal to the thread count", **ideal),
+        Line2D([], [], label=f"dotted: the machine's {PHYSICAL_CORES} cores", **cores),
+    ]
+    over = {config for config, _ in baselines.values()}
+    chosen = (
+        ", speedup over one thread on the parallel backend"
+        if over == {"threads_1"}
+        else ", speedup over the sequential backend where no one-thread run exists"
+    )
+    return finish_figure(figure, handles, notes, width, chosen=chosen)
 
 
 def dense_cells(adapter, box):
@@ -980,81 +1216,91 @@ def skip_boundary_volume(adapter, dimension, cap_bytes):
         side += 1
 
 
+def in_group(row, low, high):
+    dimension = int(row["ambient_dimension"])
+    return dimension >= low and (high is None or dimension <= high)
+
+
 def draw_memory_volume(tables, width, label):
+    """Peak memory against bounding box volume, one panel per group of ambient
+    dimensions, with each dense tool's skip boundary on the panels whose least
+    dimension it can take."""
     rows = cross_tool_rows(tables)
     note_errors(label, rows)
     drawn = [row for row in rows if point_of(tables, row, MEMORY_AXIS) is not None]
     tools = tools_present(tables, drawn, MEMORY_AXIS)
     if not tools:
         return "no row carries a peak memory in the tables"
-    dimensions = [int(row["ambient_dimension"]) for row in drawn]
-    dimension = max(
-        set(dimensions), key=lambda value: (dimensions.count(value), -value)
-    )
-    cap_bytes = tables.tier.memory_limit_gigabytes * BYTES_PER_GIGABYTE
-    figure, axes = pyplot.subplots(figsize=(width, 3.4))
-    for tool in tools:
-        points = [
-            (number_of(row, "bounding_box_volume"), row)
-            for row in drawn
-            if row["tool"] == tool
-        ]
-        plot_series(axes, None, tables, tool, points, MEMORY_AXIS, connect=False)
-    for adapter in DENSE_ADAPTERS:
-        axes.axvline(
-            skip_boundary_volume(adapter, dimension, cap_bytes),
-            color=TOOL_STYLE[adapter.NAME]["color"],
-            linestyle=(0, (4.0, 2.0)),
-            linewidth=LINE_WIDTH,
-            zorder=1,
-        )
-    axes.axhline(
-        tables.tier.memory_limit_gigabytes,
-        color=REFERENCE_COLOR,
-        linestyle=(0, (1.0, 2.0)),
-        linewidth=0.9,
-        zorder=1,
-    )
-    log_scale(axes, "x")
-    log_scale(axes, "y")
-    axes.set_xlabel("bounding box volume (positions)")
-    axes.set_ylabel("peak memory (GB)")
-    notes = [
-        Line2D(
-            [],
-            [],
-            label=f"dashed vertical, in the tool's colour: its skip boundary for a d = {dimension} cube",
-            color=REFERENCE_COLOR,
-            linestyle=(0, (4.0, 2.0)),
-            linewidth=LINE_WIDTH,
-        ),
-        Line2D(
-            [],
-            [],
-            label=f"dotted horizontal: the {tables.tier.memory_limit_gigabytes} GB cap",
-            color=REFERENCE_COLOR,
-            linestyle=(0, (1.0, 2.0)),
-            linewidth=0.9,
-        ),
-        *censored_handles(tables, drawn, MEMORY_AXIS),
+    groups = [
+        group for group in MEMORY_GROUPS if any(in_group(row, *group[:2]) for row in drawn)
     ]
+    cap_bytes = tables.tier.memory_limit_gigabytes * BYTES_PER_GIGABYTE
+    boundary = {"linestyle": (0, (4.0, 2.0)), "linewidth": LINE_WIDTH}
+    cap = {"color": REFERENCE_COLOR, "linestyle": (0, (1.0, 2.0)), "linewidth": 0.9}
+    figure, axes_list = series_panels(width, 3.4, len(groups), share_y=True)
+    boundaries_drawn = False
+    for axes, (low, high, title) in zip(axes_list, groups):
+        group_rows = [row for row in drawn if in_group(row, low, high)]
+        for tool in tools:
+            points = [
+                (number_of(row, "bounding_box_volume"), row)
+                for row in group_rows
+                if row["tool"] == tool
+            ]
+            plot_series(axes, tables, tool, points, MEMORY_AXIS, connect=False)
+        if high is not None:
+            for adapter in DENSE_ADAPTERS:
+                limit = getattr(adapter, "MAXIMUM_DIMENSION", None)
+                if limit is None or low <= limit:
+                    axes.axvline(
+                        skip_boundary_volume(adapter, low, cap_bytes),
+                        color=TOOL_STYLE[adapter.NAME]["color"],
+                        zorder=1,
+                        **boundary,
+                    )
+                    boundaries_drawn = True
+        axes.axhline(tables.tier.memory_limit_gigabytes, zorder=1, **cap)
+        log_scale(axes, "x", numticks=5)
+        log_scale(axes, "y")
+        axes.set_xlabel(f"bounding box volume\n{title}")
+    axes_list[0].set_ylabel("peak memory (GB)")
+    notes = []
+    if boundaries_drawn:
+        notes.append(
+            Line2D(
+                [],
+                [],
+                label="dashed vertical, in the tool's colour: its skip boundary for a cube of the panel's least dimension",
+                color=REFERENCE_COLOR,
+                **boundary,
+            )
+        )
+    notes.append(
+        Line2D(
+            [], [], label=f"dotted horizontal: the {tables.tier.memory_limit_gigabytes} GB cap", **cap
+        )
+    )
+    notes += convention_handles(tables, drawn, MEMORY_AXIS, False)
     return finish_figure(
         figure,
         tool_handles(tools, False),
         notes,
         width,
-        chosen=f", boundaries at d = {dimension},"
-        f" {TOOL_STYLE[cubical_ripser.NAME]['label']} also refused above"
+        chosen=f", {TOOL_STYLE[cubical_ripser.NAME]['label']} also refused above"
         f" dimension {cubical_ripser.MAXIMUM_DIMENSION}",
     )
 
 
 def draw_published_sets(tables, width, label):
-    rows = [row for row in cross_tool_rows(tables) if row["family"] == PUBLISHED_FAMILY]
+    rows = [
+        row
+        for row in timed_rows(tables)
+        if row["family"] == PUBLISHED_FAMILY and row["case"].endswith(PUBLISHED_SUFFIXES)
+    ]
     note_errors(label, rows)
     tools = tools_present(tables, rows, TIME_AXIS)
     if not tools:
-        return "no measured run on a published image set in the tables"
+        return "no measured run on a published volume at full resolution in the tables"
     own_time = {
         row["case"]: number_of(row, "wall_median")
         for row in rows
@@ -1065,11 +1311,7 @@ def draw_published_sets(tables, width, label):
         drawn_cases(tables, rows, TIME_AXIS),
         key=lambda name: (own_time.get(name, float("inf")), volume_of[name]),
     )
-    parts = rows_panel(width, rows_height(names), needs_lane(tables, rows))
-    plot_rows(parts, tables, rows, names, tools)
-    return finish_figure(
-        parts[0], tool_handles(tools, False), censored_handles(tables, rows, TIME_AXIS), width
-    )
+    return draw_rows_figure(tables, width, rows, names, tools)
 
 
 def coverage_kind(row):
@@ -1173,13 +1415,13 @@ def draw_coverage(tables, width, label):
 DENSE_ADAPTERS = (gudhi, cubical_ripser, pychomp2)
 
 FIGURES = (
-    (1, "headline_flows", PAGE_WIDTH_INCHES, draw_headline_flows),
-    (2, "ladder_d12", COLUMN_WIDTH_INCHES, draw_ladder_d12),
+    (1, "flow_ladders", PAGE_WIDTH_INCHES, draw_flow_ladders),
+    (2, "high_dimensional_flows", COLUMN_WIDTH_INCHES, draw_high_dimensional_flows),
     (3, "dimension_manifolds", PAGE_WIDTH_INCHES, draw_dimension_manifolds),
     (4, "sphere_table1", COLUMN_WIDTH_INCHES, draw_sphere_table1),
-    (5, "density_random_top", COLUMN_WIDTH_INCHES, draw_density_random_top),
+    (5, "density_random_top", PAGE_WIDTH_INCHES, draw_density_random_top),
     (6, "mixed_dimension", PAGE_WIDTH_INCHES, draw_mixed_dimension),
-    (7, "grade_count", COLUMN_WIDTH_INCHES, draw_grade_count),
+    (7, "grade_count", PAGE_WIDTH_INCHES, draw_grade_count),
     (8, "thread_scaling", COLUMN_WIDTH_INCHES, draw_thread_scaling),
     (9, "memory_volume", PAGE_WIDTH_INCHES, draw_memory_volume),
     (10, "published_sets", PAGE_WIDTH_INCHES, draw_published_sets),
