@@ -127,6 +127,32 @@ def published(name, seed, parameters, output_directory):
     )
 
 
+def published_intensity(name, seed, parameters, output_directory):
+    """Every voxel of the volume as a top cube, graded by its intensity turned
+    over: the largest value the voxel type holds less the voxel's own value, so
+    dense material enters first and the thresholded case of the same volume is
+    one sublevel set of this one."""
+    dataset = DATASETS[parameters["dataset"]]
+    volume = read_volume(fetch(dataset), dataset)
+    grades = numpy.iinfo(volume.dtype).max - volume.astype(numpy.int64)
+    coordinates = numpy.indices(volume.shape).reshape(volume.ndim, -1).T
+    case_path = output_directory / f"{name}.csv"
+    write_canonical(case_path, coordinates, grades=grades.ravel())
+    write_sidecar(
+        case_path,
+        columns="graded",
+        family="published",
+        source={
+            "kind": "generated",
+            "generator": "published_intensity",
+            "seed": seed,
+            "parameters": parameters,
+            "url": f"{BASE_URL}/{dataset['file']}",
+            "sha512": dataset["sha512"],
+        },
+    )
+
+
 def fetch(dataset):
     """The downloaded volume, fetched only when the file on disk is not already
     the one the collection publishes."""

@@ -19,4 +19,5 @@ GENERATORS = {
     "sweep": gradings.sweep,
     "random_grades": gradings.random_grades,
     "published": published.published,
+    "published_intensity": published.published_intensity,
 }

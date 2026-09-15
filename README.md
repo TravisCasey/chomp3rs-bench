@@ -51,7 +51,7 @@ The package installs one command, which is run as
 - Network access for the image build and for the first `bench generate`, which
   downloads about 320 MB of published volumes.
 
-The numbers below were measured on a machine with 16 cores and 30 GB of memory,
+The numbers below were measured on a machine with 8 cores, 16 threads and 30 GB of memory,
 and every tier requests a 24 GB cap, which assumes a machine of about that size.
 The cap is a tier's `memory_limit_gigabytes` in `cases/manifest.toml`; set a
 smaller one there for a smaller machine. That number is also what each tool's
@@ -87,7 +87,7 @@ limits its adapter enforces with the reason for each.
 
 chomp3rs itself is measured in two configurations. `full` keeps every dimension
 and is the one every figure that compares tools uses. `production` caps the
-critical dimension at 2 and appears as a second labelled row, whose answer is
+critical dimension at 2 and appears as a second labelled row on the flow covers, whose answer is
 compared only in dimensions 0 and 1, the dimensions that cap leaves meaningful.
 
 ## Preparing the inputs
@@ -136,15 +136,23 @@ it is stopped, and how much memory one run may use before it is killed.
 What each tier holds beyond the smaller ones:
 
 - `smoke` is the correctness gate: one of the smaller cases of every family,
-  with a graded case, a mixed-dimension case and a volume among them.
-- `quick` adds the coarse flow covers, the smaller manifolds, the smaller
-  random cases, the small gradings and the downsampled volumes.
-- `nightly` adds the flow ladder in dimension 12, the medium manifolds, the
-  remaining cases in dimension 8, the grading sweeps, the thread-scaling study
-  and the volumes at full resolution.
-- `full` adds every case left, among them the flow covers in dimension 16, the
-  two largest balls, the largest random cases, and the circle, torus and curve
-  in dimension 16.
+  with a graded case, a mixed-dimension case and a volume among them, a single
+  cube that measures each tool's start-up, and the `production` configuration
+  on the smallest flow cover.
+- `quick` adds a second flow cover, the circle and torus up to dimension 6, the
+  smaller balls, spheres and curves, the smaller mixed-dimension cases, two
+  random gradings and the downsampled volumes.
+- `nightly` adds the Lorenz, Dadras and dimension 12 flow ladders, the circle
+  and torus in the higher dimensions through 12, the spheres up to dimension 16,
+  the density sweep in dimension 4, the larger mixed-dimension cases, the
+  grade-count sweeps, the volumes at full resolution and graded by intensity,
+  the thread-scaling study and the `production` configuration on the flow
+  covers.
+- `full` adds every case left, among them the flow covers in dimension 16 and
+  their stage study at 16 threads, the density sweep in dimension 6, the
+  costliest circle, torus and curve cases in dimensions 9 to 11 and those in
+  dimension 16, the largest mixed-dimension and random cases, the two largest
+  balls and the vertebra volume at full resolution.
 
 The gate is run as:
 
@@ -175,10 +183,10 @@ timeout.
 
 | Tier | Runnable | Planned | Ceiling |
 | --- | --- | --- | --- |
-| `smoke` | 74 | 88 | 74 minutes |
-| `quick` | 304 | 368 | 76 hours |
-| `nightly` | 615 | 836 | 615 hours |
-| `full` | 664 | 940 | 1992 hours |
+| `smoke` | 72 | 85 | 72 minutes |
+| `quick` | 241 | 303 | 60 hours |
+| `nightly` | 761 | 1051 | 761 hours |
+| `full` | 975 | 1386 | 2925 hours |
 
 ## Checking the answers
 

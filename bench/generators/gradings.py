@@ -41,9 +41,12 @@ def sweep(name, seed, parameters, output_directory):
 
 
 def random_grades(name, seed, parameters, output_directory):
+    """Grades from a random shuffle of the cubes cut into `grade_count` groups of
+    equal size, so every grade holds as many cubes as any other and a grade
+    count equal to the cube count gives every cube a grade of its own."""
     coordinates, extents, base = read_base(parameters)
     generator = numpy.random.default_rng(seed)
-    grades = generator.integers(0, parameters["grade_count"], size=coordinates.shape[0])
+    grades = generator.permutation(coordinates.shape[0]) % parameters["grade_count"]
     write_graded_case(
         name,
         seed,
