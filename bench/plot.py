@@ -14,14 +14,18 @@ width or a font that fell back shows in the terminal. Where a figure fixes a
 parameter when it is drawn, such as the draws a density sweep takes its median
 over, the same line says which, for the caption to repeat.
 
-A mark on a time axis is a measurement and nothing else. A run the tier stopped,
-out of time or killed for memory, leaves its case without a mark for that tool.
-A figure that compares cost against size or dimension carries a second row of
-peak memory on the same axis, where a run the cap killed sits on the cap line as
-an open marker. A group whose repetitions ended differently takes the worst of
-their statuses, a run the tier skipped is not drawn, and a run that ended in an
-error is not drawn either but is named in a printed note. A run whose answer the
-check disputed is drawn where it landed inside a black ring.
+A mark is a measurement and nothing else. A run the tier stopped, out of time or
+killed for memory, leaves its case without a mark for that tool on every axis. A
+figure that compares cost against size or dimension carries a second row of peak
+memory on the same axis, with the tier's cap drawn as a dotted line, so a series
+that ends below cases its neighbours reached ran out of one limit or the other. A
+group whose repetitions ended differently takes the worst of their statuses, a
+run the tier skipped is not drawn, and a run that ended in an error is not drawn
+either but is named in a printed note. A run whose answer the check disputed is
+drawn where it landed inside a black ring.
+
+A figure of several panels names each panel above it and names the axis they
+share once, centred beneath them all.
 
 The last figure is the working view of a tier rather than a figure of the paper:
 the coverage matrix shows for every ungraded case which tools finished, were
@@ -45,7 +49,7 @@ matplotlib.use("pgf")
 
 import numpy
 from matplotlib import pyplot
-from matplotlib.colors import to_hex, to_rgb
+from matplotlib.colors import to_rgb
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch, Rectangle
 from matplotlib.ticker import (
@@ -68,16 +72,12 @@ COLUMN_WIDTH_INCHES = 300.0 / POINTS_PER_INCH
 ROW_HEIGHT_INCHES = 0.28
 SERIES_HEIGHT_INCHES = 3.0
 TWO_ROW_HEIGHT_INCHES = 4.9
-LABEL_LINE_SPACING = 1.55
+PANEL_TITLE_SIZE = 9.5
 
 FULL_CONFIG = "full"
 TIME_AXIS = "time"
 MEMORY_AXIS = "memory"
 KILOBYTES_PER_GIGABYTE = 1024 * 1024
-
-FILLED_POINT = "filled"
-OPEN_POINT = "open"
-KILLED_POINT = "killed"
 
 INK = "#1a1a19"
 MUTED = "#6b6a66"
@@ -150,7 +150,6 @@ MANIFOLD_PANELS = (
     ("circle", re.compile(r"^s1_d(\d+)$")),
     ("torus", re.compile(r"^torus_d(\d+)$")),
     ("curve", re.compile(r"^curve_d(\d+)_n2000$")),
-    ("tangent-bundle curve", re.compile(r"^curve_tb_d(\d+)$")),
 )
 MIXED_FAMILY = "random_mixed"
 PUBLISHED_FAMILY = "published"
@@ -159,14 +158,15 @@ INTENSITY_SUFFIX = "_intensity"
 PUBLISHED_SUFFIXES = (THRESHOLDED_SUFFIX, INTENSITY_SUFFIX)
 
 STAGE_BARS = (
-    ("read and build", ("read", "build")),
-    ("matching", ("matching",)),
-    ("Morse", ("morse",)),
-    ("coreduction", ("coreduction",)),
-    ("persistence", ("persistence",)),
+    ("ingest", ("read", "build")),
+    (r"\textsc{TemplateTree}", ("matching",)),
+    ("Morse incidence", ("morse",)),
+    (r"\textsc{CoreductionMatching}", ("coreduction",)),
+    ("matrix reduction", ("persistence",)),
 )
-STAGE_RAMP = ("#a3b4c6", "#8098b3", "#5f7a98", "#43607d", "#243a52")
-STAGE_LABEL_INSIDE = 12.0
+STAGE_RAMP = ("#eef8b3", "#8ed3ba", "#33a7c2", "#225da8", "#13266f")
+STAGE_LABEL_INSIDE = 11.0
+STAGE_MINIMUM_SHARE = 0.45
 STAGE_SIZE_TOKEN = re.compile(
     r"_(box[0-9.]+|n\d+|p[0-9.]+|side\d+|draw\d+|r\d+|d\d+|random_g\d+|minimal|coarse|fine)"
 )
@@ -174,6 +174,25 @@ STAGE_SIZE_TOKEN = re.compile(
 LADDER_CASE = re.compile(r"^(.+)_box([0-9.]+)$")
 DENSITY_CASE = re.compile(r"^random_top_d(\d+)_side(\d+)_p([0-9.]+)_draw(\d+)$")
 GRADED_CASE = re.compile(r"^(.+)_random_g(\d+)$")
+
+FLOW_SYSTEMS = {
+    "lorenz": "Lorenz",
+    "dadras": "Dadras",
+    "charney_devore": "Charney-DeVore",
+}
+VOLUME_NAMES = {
+    "silicium": "silicium",
+    "fuel": "fuel",
+    "marschner_lobb": "Marschner-Lobb",
+    "neghip": "neghip",
+    "hydrogen_atom": "hydrogen atom",
+    "engine": "engine",
+    "tooth": "tooth",
+    "aneurism": "aneurism",
+    "bonsai": "bonsai",
+    "foot": "foot",
+    "vertebra": "vertebra",
+}
 FONT_NAME = re.compile(rb"/BaseFont\s*/(?:[A-Z]{6}\+)?([A-Za-z0-9-]+)")
 PDF_STREAM = re.compile(rb"stream\r?\n(.*?)endstream", re.S)
 
@@ -328,37 +347,95 @@ def note_errors(label, rows):
             print(f"{label}: {row['case']} {row['tool']} ended in an error, not drawn")
 
 
+def scale_of(box):
+    """The multiplier a flow cover applies to its trajectory before tiling it
+    with cubes of side 1, which is the reciprocal of the box size the file is
+    named for: a larger scale is a finer cover and a larger case."""
+    return f"{1 / float(box):.3g}"
+
+
 def case_label(name):
+    """The name a figure gives a case: its family, then the ambient dimension,
+    then the one parameter that tells it from the rest of its family, with the
+    grade count last where the case is graded."""
+    for pattern, render in CASE_LABELS:
+        match = pattern.match(name)
+        if match:
+            return render(match)
     return name.replace("_", " ")
 
 
+def volume_label(name):
+    """The name a figure gives a published volume where a heading already says
+    whether it is thresholded or graded."""
+    return VOLUME_NAMES.get(name, name.replace("_", " "))
+
+
+CASE_LABELS = (
+    (GRADED_CASE, lambda m: f"{case_label(m.group(1))}, grades {m.group(2)}"),
+    (
+        re.compile(r"^(lorenz|dadras|charney_devore)_d(\d+)_box([0-9.]+)$"),
+        lambda m: f"{FLOW_SYSTEMS[m.group(1)]}, $d = {m.group(2)}$,"
+        f" scale {scale_of(m.group(3))}",
+    ),
+    (
+        re.compile(r"^kuramoto_sivashinsky_d(\d+)_(minimal|coarse|fine)$"),
+        lambda m: f"Kuramoto-Sivashinsky, $d = {m.group(1)}$, {m.group(2)}",
+    ),
+    (re.compile(r"^s1_d(\d+)$"), lambda m: f"circle, $d = {m.group(1)}$"),
+    (re.compile(r"^torus_d(\d+)$"), lambda m: f"torus, $d = {m.group(1)}$"),
+    (re.compile(r"^sphere_d(\d+)$"), lambda m: f"sphere, $d = {m.group(1)}$"),
+    (re.compile(r"^sphere_top_d(\d+)$"), lambda m: f"solid sphere, $d = {m.group(1)}$"),
+    (
+        re.compile(r"^ball_d(\d+)_r(\d+)$"),
+        lambda m: f"ball, $d = {m.group(1)}$, radius {m.group(2)}",
+    ),
+    (
+        re.compile(r"^curve_d(\d+)_n(\d+)$"),
+        lambda m: f"curve, $d = {m.group(1)}$, {m.group(2)} samples",
+    ),
+    (
+        DENSITY_CASE,
+        lambda m: f"random top cubes, $d = {m.group(1)}$, side {m.group(2)},"
+        f" density {m.group(3)}, draw {m.group(4)}",
+    ),
+    (
+        re.compile(r"^random_top_d(\d+)_p([0-9.]+)$"),
+        lambda m: f"random top cubes, $d = {m.group(1)}$, density {m.group(2)}",
+    ),
+    (
+        re.compile(r"^random_mixed_d(\d+)_n(\d+)$"),
+        lambda m: f"random mixed cubes, $d = {m.group(1)}$, {m.group(2)} drawn",
+    ),
+    (
+        re.compile(rf"^([a-z_]+){THRESHOLDED_SUFFIX}$"),
+        lambda m: f"{volume_label(m.group(1))}, thresholded",
+    ),
+    (
+        re.compile(rf"^([a-z_]+){INTENSITY_SUFFIX}$"),
+        lambda m: f"{volume_label(m.group(1))}, by intensity",
+    ),
+    (
+        re.compile(r"^([a-z_]+)_downsample(\d+)$"),
+        lambda m: f"{volume_label(m.group(1))}, downsampled {m.group(2)}",
+    ),
+)
+
+
 def point_of(tables, row, axis):
-    """Where a row sits on a time or a memory axis and which marker says how it
-    got there, or `None` where the row has nothing to say on that axis."""
-    status = row["status"]
-    if axis == MEMORY_AXIS and status == summarize.OUT_OF_MEMORY:
-        return float(tables.tier.memory_limit_gigabytes), KILLED_POINT
-    if status not in summarize.COMPARABLE:
+    """Where a row sits on a time or a memory axis, or `None` where the row has
+    nothing to say on that axis. A run the tier stopped or killed says nothing
+    on either."""
+    if row["status"] not in summarize.COMPARABLE:
         return None
     if axis == TIME_AXIS:
-        seconds = number_of(row, "wall_median")
-        return None if seconds is None else (seconds, FILLED_POINT)
+        return number_of(row, "wall_median")
     peak = number_of(row, "peak_rss_median_kb")
-    return None if peak is None else (peak / KILOBYTES_PER_GIGABYTE, FILLED_POINT)
+    return None if peak is None else peak / KILOBYTES_PER_GIGABYTE
 
 
-def marker_arguments(tool, convention):
-    """How a point is drawn: filled for a measurement, open for a run the cap
-    killed, which is drawn on the cap line of a memory axis."""
+def marker_arguments(tool):
     style = TOOL_STYLE[tool]
-    if convention == OPEN_POINT:
-        return {
-            "marker": style["marker"],
-            "markersize": style["size"] + 0.4,
-            "markeredgecolor": style["color"],
-            "markerfacecolor": "none",
-            "markeredgewidth": 1.0,
-        }
     return {
         "marker": style["marker"],
         "markersize": style["size"],
@@ -391,13 +468,12 @@ def plot_series(axes, tables, tool, points, axis, connect, horizontal=False, gap
     above = 1 if tool == manifest.CHOMP3RS else 0
     placed = []
     for position, row in points:
-        point = point_of(tables, row, axis)
-        if point is not None:
-            placed.append((position, point[0], point[1], row["status"]))
+        value = point_of(tables, row, axis)
+        if value is not None:
+            placed.append((position, value, row["status"]))
     placed.sort(key=lambda entry: entry[0])
-    joined = [entry for entry in placed if entry[2] == FILLED_POINT]
-    if connect and len(joined) > 1:
-        for segment in split_on_gap(joined, gap):
+    if connect and len(placed) > 1:
+        for segment in split_on_gap(placed, gap):
             if len(segment) < 2:
                 continue
             positions = [entry[0] for entry in segment]
@@ -408,14 +484,13 @@ def plot_series(axes, tables, tool, points, axis, connect, horizontal=False, gap
                 linewidth=LINE_WIDTH,
                 zorder=2 + above,
             )
-    for position, value, convention, status in placed:
-        shown = OPEN_POINT if convention == KILLED_POINT else FILLED_POINT
+    for position, value, status in placed:
         coordinates = ([value], [position]) if horizontal else ([position], [value])
         axes.plot(
             *coordinates,
             linestyle="none",
             zorder=4 + above,
-            **marker_arguments(tool, shown),
+            **marker_arguments(tool),
         )
         if status == summarize.DISPUTED:
             axes.plot(
@@ -454,7 +529,7 @@ def tool_handles(tools, with_line):
             color=TOOL_STYLE[tool]["color"],
             linestyle="-" if with_line else "none",
             linewidth=LINE_WIDTH,
-            **marker_arguments(tool, FILLED_POINT),
+            **marker_arguments(tool),
         )
         for tool in tools
     ]
@@ -511,10 +586,17 @@ def integer_ticks(axes, values):
     axes.set_xlim(ordered[0] - 0.5, ordered[-1] + 0.5)
 
 
-def case_axis_label(axes, axis_name, panel_title):
-    """The label under a panel: what the axis measures, then the case it is
-    measured on, set a little apart."""
-    axes.set_xlabel(f"{axis_name}\n{panel_title}", linespacing=LABEL_LINE_SPACING)
+def name_panel(axes, title):
+    """The name of a panel, above it, where a reader looks for a column
+    heading. The figure's legend sits outside the axes above this, so the two
+    take rows of their own and never collide."""
+    axes.set_title(title, fontsize=PANEL_TITLE_SIZE, color=INK, pad=4)
+
+
+def name_shared_axis(figure, axis_name):
+    """What every panel of a figure measures along its horizontal axis, named
+    once beneath them all rather than once per panel."""
+    figure.supxlabel(axis_name, fontsize=pyplot.rcParams["axes.labelsize"], color=INK)
 
 
 def legend_columns(handles, width):
@@ -611,8 +693,9 @@ def draw_flow_ladders(tables, width, label):
         for line in (0, 1):
             log_scale(grid[line][column], "x")
         count_ticks(grid[1][column])
-        case_axis_label(grid[1][column], "cubes in the cover", title)
+        name_panel(grid[0][column], title)
     label_time_and_memory(grid)
+    name_shared_axis(figure, "top cubes in the cover")
     return finish_figure(
         figure, tool_handles([t for t in TOOL_ORDER if t in used], True), width
     )
@@ -650,8 +733,9 @@ def draw_dimension_manifolds(tables, width, label):
             if tool not in used:
                 used.append(tool)
         integer_ticks(grid[1][column], measured)
-        case_axis_label(grid[1][column], "ambient dimension $d$", title)
+        name_panel(grid[0][column], title)
     label_time_and_memory(grid)
+    name_shared_axis(figure, "ambient dimension $d$")
     return finish_figure(
         figure, tool_handles([t for t in TOOL_ORDER if t in used], True), width
     )
@@ -664,10 +748,10 @@ def draw_spread(axes, tables, tool, entries):
     by_density = {}
     disputed = set()
     for density, row in entries:
-        point = point_of(tables, row, TIME_AXIS)
-        if point is None:
+        value = point_of(tables, row, TIME_AXIS)
+        if value is None:
             continue
-        by_density.setdefault(density, []).append(point[0])
+        by_density.setdefault(density, []).append(value)
         if row["status"] == summarize.DISPUTED:
             disputed.add(density)
     densities = sorted(by_density)
@@ -681,7 +765,7 @@ def draw_spread(axes, tables, tool, entries):
             [density, density], [min(values), max(values)], color=color, linewidth=0.8, zorder=2
         )
         axes.plot(
-            [density], [median], linestyle="none", zorder=3, **marker_arguments(tool, FILLED_POINT)
+            [density], [median], linestyle="none", zorder=3, **marker_arguments(tool)
         )
         if density in disputed:
             axes.plot(
@@ -724,10 +808,9 @@ def draw_density_random_top(tables, width, label):
         densities = sorted({density for density, _ in entries})
         axes.xaxis.set_major_locator(FixedLocator(densities))
         axes.set_xticklabels([f"{density:g}" for density in densities])
-        case_axis_label(
-            axes, "share of positions holding a cube", f"$d = {dimension}$, side {side}"
-        )
+        name_panel(axes, f"$d = {dimension}$, side {side}")
     axes_list[0].set_ylabel("wall time (s)")
+    name_shared_axis(figure, "share of positions holding a top cube")
     return finish_figure(
         figure,
         tool_handles(tools_present(tables, rows, TIME_AXIS), True),
@@ -748,10 +831,10 @@ def draw_mixed_dimension(tables, width, label):
     panels = []
     for dimension in sorted({int(row["ambient_dimension"]) for row in rows}):
         panel = [row for row in rows if int(row["ambient_dimension"]) == dimension]
-        if drawn_cases(tables, panel, TIME_AXIS):
+        if len(drawn_cases(tables, panel, TIME_AXIS)) >= 2:
             panels.append((dimension, panel))
     if not panels:
-        return "no measured run on a random mixed-dimension case in the tables"
+        return "no random mixed-dimension ladder of two or more sizes in the tables"
     figure, grid = time_and_memory_panels(width, len(panels))
     used = []
     for column, (dimension, panel) in enumerate(panels):
@@ -765,8 +848,9 @@ def draw_mixed_dimension(tables, width, label):
         low, high = grid[1][column].get_xlim()
         grid[1][column].set_xlim(low / 1.3, high * 1.3)
         count_ticks(grid[1][column])
-        case_axis_label(grid[1][column], "cubes in the case", f"$d = {dimension}$")
+        name_panel(grid[0][column], f"$d = {dimension}$")
     label_time_and_memory(grid)
+    name_shared_axis(figure, "maximal cubes in the case")
     return finish_figure(
         figure, tool_handles([t for t in TOOL_ORDER if t in used], True), width
     )
@@ -816,8 +900,9 @@ def draw_grade_count(tables, width, label):
         )
         axes.xaxis.set_minor_locator(NullLocator())
         log_scale(axes, "y")
-        case_axis_label(axes, "grades in the filtration", case_label(base))
+        name_panel(axes, case_label(base))
     axes_list[0].set_ylabel("wall time (s)")
+    name_shared_axis(figure, "grades in the filtration")
     return finish_figure(
         figure, tool_handles(tools_present(tables, rows, TIME_AXIS), True), width
     )
@@ -885,7 +970,7 @@ def draw_published_sets(tables, width, label):
         for column, axis in enumerate((TIME_AXIS, MEMORY_AXIS)):
             plot_rows(grid[line][column], tables, rows, names, tools, axis)
         grid[line][0].set_yticklabels(
-            [case_label(name[: -len(suffix)]) for name in names]
+            [volume_label(name[: -len(suffix)]) for name in names]
         )
         grid[line][0].set_title(title, loc="left", fontsize=9, color=INK)
     grid[-1][0].set_xlabel("wall time (s)")
@@ -956,6 +1041,23 @@ def stage_case_groups(tables, totals):
     return [(title, names) for title, names in groups if names]
 
 
+def readable_on(color):
+    """Ink or paper for a label written inside a bar of this colour."""
+    red, green, blue = to_rgb(color)
+    return INK if 0.299 * red + 0.587 * green + 0.114 * blue > 0.5 else SURFACE
+
+
+def drawn_widths(shares):
+    """Every stage the case spent time in drawn at least `STAGE_MINIMUM_SHARE`
+    wide, the widths then scaled back so that the bar is exactly 100 across. On
+    a case that spends 99 percent of its time in one stage the other four are
+    slivers thinner than the hairline between them, and would otherwise not be
+    there to read at all; the share written inside a segment is the true one."""
+    lifted = [max(share, STAGE_MINIMUM_SHARE) if share > 0 else 0.0 for share in shares]
+    total = sum(lifted)
+    return [100 * value / total for value in lifted]
+
+
 def draw_stage_shares(tables, width, label):
     """Where CHomP3-rs spends its time: the share of its stage total each stage
     takes, one row per case grouped by family, with the stage total beside it."""
@@ -973,44 +1075,48 @@ def draw_stage_shares(tables, width, label):
         figsize=(width, height),
         squeeze=False,
         sharex="col",
-        gridspec_kw={"height_ratios": [len(names) for _, names in groups], "width_ratios": [3.0, 1.0]},
+        gridspec_kw={"height_ratios": [len(names) for _, names in groups], "width_ratios": [3.4, 1.0]},
     )
     for line, (title, names) in enumerate(groups):
         left, right = grid[line]
         for index, name in enumerate(names):
             total = sum(totals[name].values())
+            shares = [
+                100 * sum(totals[name].get(member, 0.0) for member in members) / total
+                for _, members in STAGE_BARS
+            ]
             start = 0.0
-            for position, (_, members) in enumerate(STAGE_BARS):
-                share = 100 * sum(totals[name].get(m, 0.0) for m in members) / total
-                if share <= 0:
+            for position, drawn in enumerate(drawn_widths(shares)):
+                if drawn <= 0:
                     continue
                 left.barh(
                     index,
-                    max(share - 0.5, 0.15),
-                    left=start + 0.25,
-                    height=0.64,
+                    drawn,
+                    left=start,
+                    height=0.66,
                     color=STAGE_RAMP[position],
-                    linewidth=0,
+                    edgecolor=SURFACE,
+                    linewidth=0.5,
                     zorder=2,
                 )
-                if share >= STAGE_LABEL_INSIDE:
+                if shares[position] >= STAGE_LABEL_INSIDE:
                     left.text(
-                        start + share / 2,
+                        start + drawn / 2,
                         index,
-                        f"{share:.0f}\\%",
+                        f"{shares[position]:.0f}\\%",
                         ha="center",
                         va="center",
                         fontsize=7,
-                        color=INK if position < 2 else SURFACE,
+                        color=readable_on(STAGE_RAMP[position]),
                         zorder=3,
                     )
-                start += share
+                start += drawn
             right.plot(
                 [total],
                 [index],
                 linestyle="none",
                 zorder=4,
-                **marker_arguments(manifest.CHOMP3RS, FILLED_POINT),
+                **marker_arguments(manifest.CHOMP3RS),
             )
         for axes in (left, right):
             axes.set_ylim(len(names) - 0.5, -0.5)
@@ -1024,6 +1130,7 @@ def draw_stage_shares(tables, width, label):
         left.set_yticklabels([case_label(name) for name in names])
         right.set_yticklabels([])
         left.set_xlim(0, 100)
+        left.grid(axis="x", visible=False)
         right.grid(axis="x", visible=True)
         left.set_title(title, loc="left", fontsize=9, color=INK)
     log_scale(grid[-1][1], "x", numticks=6)
@@ -1036,11 +1143,14 @@ def draw_stage_shares(tables, width, label):
     figure.legend(
         handles=handles,
         loc="outside upper center",
-        ncol=len(STAGE_BARS),
+        ncol=3,
         handlelength=1.4,
         borderaxespad=0.2,
     )
-    return figure, ""
+    return figure, (
+        f", a stage under {STAGE_MINIMUM_SHARE:g} percent of a case's total"
+        f" drawn at {STAGE_MINIMUM_SHARE:g} percent"
+    )
 
 
 def coverage_kind(row):
@@ -1107,7 +1217,7 @@ def draw_coverage(tables, width, label):
         axes.text(
             start + count / 2,
             -0.55,
-            case_label(family),
+            family.replace("_", " "),
             ha="left",
             va="bottom",
             fontsize=8,

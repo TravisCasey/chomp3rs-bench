@@ -302,7 +302,7 @@ columns = "plain"
 size = "small"
 generator = "curve"
 seed = 48
-parameters = { dimension = 4, modes = 3, samples = 2000, tangent_bundle = false }
+parameters = { dimension = 4, modes = 3, samples = 2000 }
 
 [cases.curve_d6_n2000]
 file = "generated/curve_d6_n2000.csv"
@@ -311,7 +311,7 @@ columns = "plain"
 size = "small"
 generator = "curve"
 seed = 50
-parameters = { dimension = 6, modes = 3, samples = 2000, tangent_bundle = false }
+parameters = { dimension = 6, modes = 3, samples = 2000 }
 
 [cases.curve_d8_n2000]
 file = "generated/curve_d8_n2000.csv"
@@ -320,7 +320,7 @@ columns = "plain"
 size = "small"
 generator = "curve"
 seed = 52
-parameters = { dimension = 8, modes = 3, samples = 2000, tangent_bundle = false }
+parameters = { dimension = 8, modes = 3, samples = 2000 }
 
 [cases.curve_d12_n2000]
 file = "generated/curve_d12_n2000.csv"
@@ -329,7 +329,7 @@ columns = "plain"
 size = "small"
 generator = "curve"
 seed = 54
-parameters = { dimension = 12, modes = 3, samples = 2000, tangent_bundle = false }
+parameters = { dimension = 12, modes = 3, samples = 2000 }
 
 [cases.curve_d16_n2000]
 file = "generated/curve_d16_n2000.csv"
@@ -338,43 +338,7 @@ columns = "plain"
 size = "small"
 generator = "curve"
 seed = 56
-parameters = { dimension = 16, modes = 3, samples = 2000, tangent_bundle = false }
-
-[cases.curve_tb_d6]
-file = "generated/curve_tb_d6.csv"
-family = "curve"
-columns = "plain"
-size = "small"
-generator = "curve"
-seed = 58
-parameters = { dimension = 6, modes = 3, samples = 2000, tangent_bundle = true }
-
-[cases.curve_tb_d8]
-file = "generated/curve_tb_d8.csv"
-family = "curve"
-columns = "plain"
-size = "small"
-generator = "curve"
-seed = 59
-parameters = { dimension = 8, modes = 3, samples = 2000, tangent_bundle = true }
-
-[cases.curve_tb_d12]
-file = "generated/curve_tb_d12.csv"
-family = "curve"
-columns = "plain"
-size = "small"
-generator = "curve"
-seed = 60
-parameters = { dimension = 12, modes = 3, samples = 2000, tangent_bundle = true }
-
-[cases.curve_tb_d16]
-file = "generated/curve_tb_d16.csv"
-family = "curve"
-columns = "plain"
-size = "small"
-generator = "curve"
-seed = 61
-parameters = { dimension = 16, modes = 3, samples = 2000, tangent_bundle = true }
+parameters = { dimension = 16, modes = 3, samples = 2000 }
 
 [cases.s1_d4_sweep_g4]
 file = "generated/s1_d4_sweep_g4.csv"
@@ -716,16 +680,7 @@ columns = "plain"
 size = "small"
 generator = "curve"
 seed = 109
-parameters = { dimension = 10, modes = 3, samples = 2000, tangent_bundle = false }
-
-[cases.curve_tb_d10]
-file = "generated/curve_tb_d10.csv"
-family = "curve"
-columns = "plain"
-size = "small"
-generator = "curve"
-seed = 111
-parameters = { dimension = 10, modes = 3, samples = 2000, tangent_bundle = true }
+parameters = { dimension = 10, modes = 3, samples = 2000 }
 
 [cases.sphere_d16]
 file = "generated/sphere_d16.csv"
@@ -1547,7 +1502,6 @@ cases = [
     "s1_d6",
     "torus_d5",
     "curve_d6_n2000",
-    "curve_tb_d6",
     "random_mixed_d8_n500",
     "random_mixed_d8_n2000",
     "random_top_d4_p0.5_random_g8",
@@ -1601,9 +1555,7 @@ cases = [
     "torus_d12",
     "sphere_d16",
     "curve_d8_n2000",
-    "curve_tb_d8",
     "curve_d10_n2000",
-    "curve_tb_d10",
     "random_top_d4_side16_p0.1_draw1",
     "random_top_d4_side16_p0.1_draw2",
     "random_top_d4_side16_p0.1_draw3",
@@ -1694,9 +1646,7 @@ cases = [
     "torus_d11",
     "torus_d16",
     "curve_d12_n2000",
-    "curve_tb_d12",
     "curve_d16_n2000",
-    "curve_tb_d16",
     "random_top_d6_side8_p0.1_draw1",
     "random_top_d6_side8_p0.1_draw2",
     "random_top_d6_side8_p0.1_draw3",

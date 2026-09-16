@@ -247,12 +247,14 @@ in order, `flow_ladders`, `dimension_manifolds`, `density_random_top`,
 drawn, and one line says what was missing, so a smaller tier yields a subset of
 the eight.
 
-A mark on a time axis is a measurement and nothing else: a run the tier stopped
-leaves its case without a mark for that tool. The figures that plot cost against
-size or dimension carry a second row of peak memory on the same axis, where a
-killed run reached the cap and sits on the cap line as an open marker, while a
-run out of time has no peak to draw and is absent. No figure carries a note
-beneath it; the caption names what the marks mean.
+A mark is a measurement and nothing else: a run the tier stopped, out of time or
+killed for memory, leaves its case without a mark for that tool on every axis.
+The figures that plot cost against size or dimension carry a second row of peak
+memory on the same axis, with the tier's cap drawn as a dotted line, so a series
+that stops short of the sizes its neighbours reached ran out of one limit or the
+other. A figure of several panels names each panel above it and names the axis
+they share once, centred beneath them all. No figure carries a note beneath it;
+the caption names what the marks mean.
 
 The last figure, `coverage`, is the working view of a tier rather than a figure
 of the paper: it shows for every ungraded case which tools finished, were
