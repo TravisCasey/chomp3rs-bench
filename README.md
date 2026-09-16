@@ -23,8 +23,7 @@ turns the results into tables and figures.
   driver, each at a pinned revision.
 - `results/` holds one JSON record per measured run under `results/runs/` and
   the summary tables under `results/summary/`.
-- `figures/` holds the figures, one directory per tier, and under
-  `figures/reference/` the published timings one figure draws beside them.
+- `figures/` holds the figures, one directory per tier.
 - `docs/` holds `docs/tools.md`, the record of where each tool came from, which
   version is built, and the limits its adapter enforces.
 
@@ -86,9 +85,11 @@ version the image builds, its licence, the coefficient fields it offers, and the
 limits its adapter enforces with the reason for each.
 
 chomp3rs itself is measured in two configurations. `full` keeps every dimension
-and is the one every figure that compares tools uses. `production` caps the
-critical dimension at 2 and appears as a second labelled row on the flow covers, whose answer is
+and is the one every figure uses. `production` caps the critical dimension at 2
+and runs on one flow cover in the smoke and quick tiers, whose answer is
 compared only in dimensions 0 and 1, the dimensions that cap leaves meaningful.
+No figure draws it: on the flow covers the stages that cap bounds take under one
+percent of the run, so its time is within a few percent of `full`.
 
 ## Preparing the inputs
 
@@ -129,8 +130,8 @@ it is stopped, and how much memory one run may use before it is killed.
 | Tier | Budget | Measured | Repetitions | Timeout per run | Memory cap |
 | --- | --- | --- | --- | --- | --- |
 | `smoke` | 10 minutes | 3 minutes 42 seconds | 1 | 1 minute | 24 GB |
-| `quick` | 1 hour | 47 minutes | 3 | 5 minutes | 24 GB |
-| `nightly` | 8 hours | not yet measured | 3 | 20 minutes | 24 GB |
+| `quick` | 1 hour | not yet measured | 3 | 5 minutes | 24 GB |
+| `nightly` | 8 hours | not yet measured | 2 | 20 minutes | 24 GB |
 | `full` | 48 hours | not yet measured | 3 | 60 minutes | 24 GB |
 
 What each tier holds beyond the smaller ones:
@@ -139,19 +140,18 @@ What each tier holds beyond the smaller ones:
   with a graded case, a mixed-dimension case and a volume among them, a single
   cube, and the `production` configuration on the smallest flow cover.
 - `quick` adds a second flow cover, the circle and torus up to dimension 6, the
-  smaller balls, spheres and curves, the smaller mixed-dimension cases, two
-  random gradings and the downsampled volumes.
+  smaller curves and mixed-dimension cases, two random gradings and the
+  downsampled volumes.
 - `nightly` adds the Lorenz, Dadras and dimension 12 flow ladders, the circle
-  and torus in the higher dimensions through 12, the spheres up to dimension 16,
-  the density sweep in dimension 4, the larger mixed-dimension cases, the
-  grade-count sweeps, the volumes at full resolution and graded by intensity,
-  the thread-scaling study and the `production` configuration on the flow
-  covers.
+  and torus in the higher dimensions through 12, the density sweep in dimension
+  4, the mixed-dimension ladders at dimensions 6 and 8, the grade-count sweeps,
+  the volumes at full resolution and five graded by intensity, the sphere of
+  dimension 16 and the thread-scaling study.
 - `full` adds every case left, among them the flow covers in dimension 16 and
   their stage study at 16 threads, the density sweep in dimension 6, the
   costliest circle, torus and curve cases in dimensions 9 to 12 and those in
-  dimension 16, the largest mixed-dimension and random cases, the two largest
-  balls and the vertebra volume at full resolution.
+  dimension 16, the mixed-dimension ladder at dimension 10 and its largest cases
+  at dimension 8, and the vertebra volume at full resolution.
 
 The gate is run as:
 
@@ -183,9 +183,9 @@ timeout.
 | Tier | Runnable | Planned | Ceiling |
 | --- | --- | --- | --- |
 | `smoke` | 72 | 85 | 72 minutes |
-| `quick` | 240 | 303 | 60 hours |
-| `nightly` | 753 | 1016 | 753 hours |
-| `full` | 976 | 1386 | 2928 hours |
+| `quick` | 198 | 240 | 50 hours |
+| `nightly` | 653 | 864 | 435 hours |
+| `full` | 858 | 1210 | 2574 hours |
 
 ## Checking the answers
 
@@ -240,23 +240,27 @@ measured medians, takes the worst of their statuses, and lists the mix in its
 uv run bench plot smoke
 ```
 
-writes `figures/<tier>/fig<NN>_<name>.pdf` and `.png`. The eleven figures are,
-in order, `flow_ladders`, `high_dimensional_flows`, `dimension_manifolds`,
-`sphere_table1`, `density_random_top`, `mixed_dimension`, `grade_count`,
-`thread_scaling`, `memory_volume`, `published_sets` and `coverage`. A figure
-whose cases or tools the tier's tables do not hold is not drawn, and one line
-says what was missing, so a smaller tier yields a subset of the eleven.
+writes `figures/<tier>/fig<NN>_<name>.pdf` and `.png`. The eight figures are,
+in order, `flow_ladders`, `dimension_manifolds`, `density_random_top`,
+`mixed_dimension`, `grade_count`, `published_sets`, `stage_shares` and
+`coverage`. A figure whose cases or tools the tier's tables do not hold is not
+drawn, and one line says what was missing, so a smaller tier yields a subset of
+the eight.
 
 A mark on a time axis is a measurement and nothing else: a run the tier stopped
-leaves its case without a mark for that tool. On a memory axis a killed run
-reached the cap and sits on the cap line as an open marker, while a run out of
-time has no peak to draw and is absent. Every figure's legend names the
-conventions that figure uses. The last figure, `coverage`, shows for every
-ungraded case of the tier which tools finished, were stopped, were killed, or
-refused it and why.
+leaves its case without a mark for that tool. The figures that plot cost against
+size or dimension carry a second row of peak memory on the same axis, where a
+killed run reached the cap and sits on the cap line as an open marker, while a
+run out of time has no peak to draw and is absent. No figure carries a note
+beneath it; the caption names what the marks mean.
 
-Figure 4 draws `figures/reference/table1.csv`, a transcription of Table 1(a) of
-arXiv 2105.09870, beside the suite's own sphere cases.
+The last figure, `coverage`, is the working view of a tier rather than a figure
+of the paper: it shows for every ungraded case which tools finished, were
+stopped, were killed, or refused it and why.
+
+The thread-scaling study draws no figure. Its speedups are read from
+`runs.csv`, where the `threads_1` to `threads_16` rows of each case of the study
+sit beside one another.
 
 ## Reading a result record
 

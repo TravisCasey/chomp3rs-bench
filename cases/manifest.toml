@@ -214,24 +214,6 @@ generator = "torus"
 seed = 12
 parameters = { dimension = 16, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
 
-[cases.ball_d2_r2]
-file = "generated/ball_d2_r2.csv"
-family = "ball"
-columns = "plain"
-size = "small"
-generator = "ball"
-seed = 13
-parameters = { dimension = 2, radius = 2 }
-
-[cases.ball_d2_r4]
-file = "generated/ball_d2_r4.csv"
-family = "ball"
-columns = "plain"
-size = "small"
-generator = "ball"
-seed = 14
-parameters = { dimension = 2, radius = 4 }
-
 [cases.ball_d4_r2]
 file = "generated/ball_d4_r2.csv"
 family = "ball"
@@ -240,51 +222,6 @@ size = "small"
 generator = "ball"
 seed = 15
 parameters = { dimension = 4, radius = 2 }
-
-[cases.ball_d4_r4]
-file = "generated/ball_d4_r4.csv"
-family = "ball"
-columns = "plain"
-size = "medium"
-generator = "ball"
-seed = 16
-parameters = { dimension = 4, radius = 4 }
-
-[cases.ball_d6_r2]
-file = "generated/ball_d6_r2.csv"
-family = "ball"
-columns = "plain"
-size = "medium"
-generator = "ball"
-seed = 17
-parameters = { dimension = 6, radius = 2 }
-
-[cases.ball_d6_r4]
-file = "generated/ball_d6_r4.csv"
-family = "ball"
-columns = "plain"
-size = "large"
-generator = "ball"
-seed = 18
-parameters = { dimension = 6, radius = 4 }
-
-[cases.ball_d8_r2]
-file = "generated/ball_d8_r2.csv"
-family = "ball"
-columns = "plain"
-size = "large"
-generator = "ball"
-seed = 19
-parameters = { dimension = 8, radius = 2 }
-
-[cases.sphere_d3]
-file = "generated/sphere_d3.csv"
-family = "sphere"
-columns = "extent"
-size = "small"
-generator = "sphere"
-seed = 20
-parameters = { dimension = 3 }
 
 [cases.sphere_d4]
 file = "generated/sphere_d4.csv"
@@ -295,42 +232,6 @@ generator = "sphere"
 seed = 21
 parameters = { dimension = 4 }
 
-[cases.sphere_d5]
-file = "generated/sphere_d5.csv"
-family = "sphere"
-columns = "extent"
-size = "small"
-generator = "sphere"
-seed = 22
-parameters = { dimension = 5 }
-
-[cases.sphere_d6]
-file = "generated/sphere_d6.csv"
-family = "sphere"
-columns = "extent"
-size = "small"
-generator = "sphere"
-seed = 23
-parameters = { dimension = 6 }
-
-[cases.sphere_d7]
-file = "generated/sphere_d7.csv"
-family = "sphere"
-columns = "extent"
-size = "small"
-generator = "sphere"
-seed = 24
-parameters = { dimension = 7 }
-
-[cases.sphere_d8]
-file = "generated/sphere_d8.csv"
-family = "sphere"
-columns = "extent"
-size = "small"
-generator = "sphere"
-seed = 25
-parameters = { dimension = 8 }
-
 [cases.sphere_top_d3]
 file = "generated/sphere_top_d3.csv"
 family = "sphere"
@@ -339,33 +240,6 @@ size = "small"
 generator = "sphere_top"
 seed = 26
 parameters = { dimension = 3, side = 3 }
-
-[cases.sphere_top_d4]
-file = "generated/sphere_top_d4.csv"
-family = "sphere"
-columns = "plain"
-size = "small"
-generator = "sphere_top"
-seed = 27
-parameters = { dimension = 4, side = 3 }
-
-[cases.sphere_top_d6]
-file = "generated/sphere_top_d6.csv"
-family = "sphere"
-columns = "plain"
-size = "small"
-generator = "sphere_top"
-seed = 28
-parameters = { dimension = 6, side = 3 }
-
-[cases.sphere_top_d8]
-file = "generated/sphere_top_d8.csv"
-family = "sphere"
-columns = "plain"
-size = "medium"
-generator = "sphere_top"
-seed = 29
-parameters = { dimension = 8, side = 3 }
 
 [cases."random_top_d4_p0.5"]
 file = "generated/random_top_d4_p0.5.csv"
@@ -376,33 +250,6 @@ generator = "random_top"
 seed = 34
 parameters = { dimension = 4, side = 8, probability = 0.5 }
 
-[cases."random_top_d8_p0.3"]
-file = "generated/random_top_d8_p0.3.csv"
-family = "random_top"
-columns = "plain"
-size = "medium"
-generator = "random_top"
-seed = 39
-parameters = { dimension = 8, side = 4, probability = 0.3 }
-
-[cases."random_top_d8_p0.5"]
-file = "generated/random_top_d8_p0.5.csv"
-family = "random_top"
-columns = "plain"
-size = "medium"
-generator = "random_top"
-seed = 40
-parameters = { dimension = 8, side = 4, probability = 0.5 }
-
-[cases."random_top_d8_p0.7"]
-file = "generated/random_top_d8_p0.7.csv"
-family = "random_top"
-columns = "plain"
-size = "medium"
-generator = "random_top"
-seed = 41
-parameters = { dimension = 8, side = 4, probability = 0.7 }
-
 [cases.random_mixed_d4_n500]
 file = "generated/random_mixed_d4_n500.csv"
 family = "random_mixed"
@@ -411,15 +258,6 @@ size = "small"
 generator = "random_mixed"
 seed = 42
 parameters = { dimension = 4, side = 8, count = 500, minimum_cube_dimension = 1, maximum_cube_dimension = 4 }
-
-[cases.random_mixed_d4_n2000]
-file = "generated/random_mixed_d4_n2000.csv"
-family = "random_mixed"
-columns = "extent"
-size = "small"
-generator = "random_mixed"
-seed = 43
-parameters = { dimension = 4, side = 8, count = 2000, minimum_cube_dimension = 1, maximum_cube_dimension = 4 }
 
 [cases.random_mixed_d6_n500]
 file = "generated/random_mixed_d6_n500.csv"
@@ -466,15 +304,6 @@ generator = "curve"
 seed = 48
 parameters = { dimension = 4, modes = 3, samples = 2000, tangent_bundle = false }
 
-[cases.curve_d4_n10000]
-file = "generated/curve_d4_n10000.csv"
-family = "curve"
-columns = "plain"
-size = "medium"
-generator = "curve"
-seed = 49
-parameters = { dimension = 4, modes = 3, samples = 10000, tangent_bundle = false }
-
 [cases.curve_d6_n2000]
 file = "generated/curve_d6_n2000.csv"
 family = "curve"
@@ -483,15 +312,6 @@ size = "small"
 generator = "curve"
 seed = 50
 parameters = { dimension = 6, modes = 3, samples = 2000, tangent_bundle = false }
-
-[cases.curve_d6_n10000]
-file = "generated/curve_d6_n10000.csv"
-family = "curve"
-columns = "plain"
-size = "medium"
-generator = "curve"
-seed = 51
-parameters = { dimension = 6, modes = 3, samples = 10000, tangent_bundle = false }
 
 [cases.curve_d8_n2000]
 file = "generated/curve_d8_n2000.csv"
@@ -502,15 +322,6 @@ generator = "curve"
 seed = 52
 parameters = { dimension = 8, modes = 3, samples = 2000, tangent_bundle = false }
 
-[cases.curve_d8_n10000]
-file = "generated/curve_d8_n10000.csv"
-family = "curve"
-columns = "plain"
-size = "medium"
-generator = "curve"
-seed = 53
-parameters = { dimension = 8, modes = 3, samples = 10000, tangent_bundle = false }
-
 [cases.curve_d12_n2000]
 file = "generated/curve_d12_n2000.csv"
 family = "curve"
@@ -520,15 +331,6 @@ generator = "curve"
 seed = 54
 parameters = { dimension = 12, modes = 3, samples = 2000, tangent_bundle = false }
 
-[cases.curve_d12_n10000]
-file = "generated/curve_d12_n10000.csv"
-family = "curve"
-columns = "plain"
-size = "medium"
-generator = "curve"
-seed = 55
-parameters = { dimension = 12, modes = 3, samples = 10000, tangent_bundle = false }
-
 [cases.curve_d16_n2000]
 file = "generated/curve_d16_n2000.csv"
 family = "curve"
@@ -537,15 +339,6 @@ size = "small"
 generator = "curve"
 seed = 56
 parameters = { dimension = 16, modes = 3, samples = 2000, tangent_bundle = false }
-
-[cases.curve_d16_n10000]
-file = "generated/curve_d16_n10000.csv"
-family = "curve"
-columns = "plain"
-size = "medium"
-generator = "curve"
-seed = 57
-parameters = { dimension = 16, modes = 3, samples = 10000, tangent_bundle = false }
 
 [cases.curve_tb_d6]
 file = "generated/curve_tb_d6.csv"
@@ -925,15 +718,6 @@ generator = "curve"
 seed = 109
 parameters = { dimension = 10, modes = 3, samples = 2000, tangent_bundle = false }
 
-[cases.curve_d10_n10000]
-file = "generated/curve_d10_n10000.csv"
-family = "curve"
-columns = "plain"
-size = "large"
-generator = "curve"
-seed = 110
-parameters = { dimension = 10, modes = 3, samples = 10000, tangent_bundle = false }
-
 [cases.curve_tb_d10]
 file = "generated/curve_tb_d10.csv"
 family = "curve"
@@ -942,69 +726,6 @@ size = "small"
 generator = "curve"
 seed = 111
 parameters = { dimension = 10, modes = 3, samples = 2000, tangent_bundle = true }
-
-[cases.sphere_d9]
-file = "generated/sphere_d9.csv"
-family = "sphere"
-columns = "extent"
-size = "small"
-generator = "sphere"
-seed = 112
-parameters = { dimension = 9 }
-
-[cases.sphere_d10]
-file = "generated/sphere_d10.csv"
-family = "sphere"
-columns = "extent"
-size = "small"
-generator = "sphere"
-seed = 113
-parameters = { dimension = 10 }
-
-[cases.sphere_d11]
-file = "generated/sphere_d11.csv"
-family = "sphere"
-columns = "extent"
-size = "small"
-generator = "sphere"
-seed = 114
-parameters = { dimension = 11 }
-
-[cases.sphere_d12]
-file = "generated/sphere_d12.csv"
-family = "sphere"
-columns = "extent"
-size = "small"
-generator = "sphere"
-seed = 115
-parameters = { dimension = 12 }
-
-[cases.sphere_d13]
-file = "generated/sphere_d13.csv"
-family = "sphere"
-columns = "extent"
-size = "medium"
-generator = "sphere"
-seed = 116
-parameters = { dimension = 13 }
-
-[cases.sphere_d14]
-file = "generated/sphere_d14.csv"
-family = "sphere"
-columns = "extent"
-size = "medium"
-generator = "sphere"
-seed = 117
-parameters = { dimension = 14 }
-
-[cases.sphere_d15]
-file = "generated/sphere_d15.csv"
-family = "sphere"
-columns = "extent"
-size = "large"
-generator = "sphere"
-seed = 118
-parameters = { dimension = 15 }
 
 [cases.sphere_d16]
 file = "generated/sphere_d16.csv"
@@ -1537,6 +1258,87 @@ generator = "random_mixed"
 seed = 177
 parameters = { dimension = 10, side = 4, count = 50000, minimum_cube_dimension = 1, maximum_cube_dimension = 10 }
 
+[cases.random_mixed_d6_n5000]
+file = "generated/random_mixed_d6_n5000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "medium"
+generator = "random_mixed"
+seed = 193
+parameters = { dimension = 6, side = 5, count = 5000, minimum_cube_dimension = 1, maximum_cube_dimension = 6 }
+
+[cases.random_mixed_d6_n12000]
+file = "generated/random_mixed_d6_n12000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "medium"
+generator = "random_mixed"
+seed = 194
+parameters = { dimension = 6, side = 5, count = 12000, minimum_cube_dimension = 1, maximum_cube_dimension = 6 }
+
+[cases.random_mixed_d6_n30000]
+file = "generated/random_mixed_d6_n30000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "medium"
+generator = "random_mixed"
+seed = 195
+parameters = { dimension = 6, side = 5, count = 30000, minimum_cube_dimension = 1, maximum_cube_dimension = 6 }
+
+[cases.random_mixed_d8_n1000]
+file = "generated/random_mixed_d8_n1000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "small"
+generator = "random_mixed"
+seed = 196
+parameters = { dimension = 8, side = 4, count = 1000, minimum_cube_dimension = 1, maximum_cube_dimension = 8 }
+
+[cases.random_mixed_d8_n5000]
+file = "generated/random_mixed_d8_n5000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "medium"
+generator = "random_mixed"
+seed = 197
+parameters = { dimension = 8, side = 4, count = 5000, minimum_cube_dimension = 1, maximum_cube_dimension = 8 }
+
+[cases.random_mixed_d8_n25000]
+file = "generated/random_mixed_d8_n25000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "large"
+generator = "random_mixed"
+seed = 198
+parameters = { dimension = 8, side = 4, count = 25000, minimum_cube_dimension = 1, maximum_cube_dimension = 8 }
+
+[cases.random_mixed_d10_n500]
+file = "generated/random_mixed_d10_n500.csv"
+family = "random_mixed"
+columns = "extent"
+size = "small"
+generator = "random_mixed"
+seed = 199
+parameters = { dimension = 10, side = 4, count = 500, minimum_cube_dimension = 1, maximum_cube_dimension = 10 }
+
+[cases.random_mixed_d10_n2000]
+file = "generated/random_mixed_d10_n2000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "small"
+generator = "random_mixed"
+seed = 200
+parameters = { dimension = 10, side = 4, count = 2000, minimum_cube_dimension = 1, maximum_cube_dimension = 10 }
+
+[cases.random_mixed_d10_n5000]
+file = "generated/random_mixed_d10_n5000.csv"
+family = "random_mixed"
+columns = "extent"
+size = "medium"
+generator = "random_mixed"
+seed = 201
+parameters = { dimension = 10, side = 4, count = 5000, minimum_cube_dimension = 1, maximum_cube_dimension = 10 }
+
 [cases."lorenz_d6_box0.5_random_g2"]
 file = "generated/lorenz_d6_box0.5_random_g2.csv"
 family = "flows"
@@ -1654,6 +1456,24 @@ generator = "published_intensity"
 seed = 190
 parameters = { dataset = "foot" }
 
+[cases.tooth_intensity]
+file = "generated/tooth_intensity.csv"
+family = "published"
+columns = "graded"
+size = "large"
+generator = "published_intensity"
+seed = 191
+parameters = { dataset = "tooth" }
+
+[cases.bonsai_intensity]
+file = "generated/bonsai_intensity.csv"
+family = "published"
+columns = "graded"
+size = "large"
+generator = "published_intensity"
+seed = 192
+parameters = { dataset = "bonsai" }
+
 [configs.threads_1]
 backend = "rayon"
 threads = 1
@@ -1726,17 +1546,8 @@ cases = [
     "s1_d5",
     "s1_d6",
     "torus_d5",
-    "ball_d2_r2",
-    "ball_d2_r4",
-    "sphere_d3",
-    "sphere_d5",
-    "sphere_d6",
-    "sphere_d7",
-    "sphere_top_d4",
-    "sphere_top_d6",
     "curve_d6_n2000",
     "curve_tb_d6",
-    "random_mixed_d4_n2000",
     "random_mixed_d8_n500",
     "random_mixed_d8_n2000",
     "random_top_d4_p0.5_random_g8",
@@ -1788,26 +1599,11 @@ cases = [
     "torus_d7",
     "torus_d8",
     "torus_d12",
-    "ball_d4_r4",
-    "ball_d6_r2",
-    "sphere_d8",
-    "sphere_d9",
-    "sphere_d10",
-    "sphere_d11",
-    "sphere_d12",
-    "sphere_d13",
-    "sphere_d14",
-    "sphere_d15",
     "sphere_d16",
-    "sphere_top_d8",
     "curve_d8_n2000",
     "curve_tb_d8",
-    "curve_d4_n10000",
-    "curve_d6_n10000",
-    "curve_d8_n10000",
     "curve_d10_n2000",
     "curve_tb_d10",
-    "curve_d12_n10000",
     "random_top_d4_side16_p0.1_draw1",
     "random_top_d4_side16_p0.1_draw2",
     "random_top_d4_side16_p0.1_draw3",
@@ -1837,6 +1633,11 @@ cases = [
     "random_top_d4_side16_p0.9_draw3",
     "random_mixed_d6_n500",
     "random_mixed_d6_n2000",
+    "random_mixed_d6_n5000",
+    "random_mixed_d6_n12000",
+    "random_mixed_d6_n30000",
+    "random_mixed_d8_n1000",
+    "random_mixed_d8_n5000",
     "random_mixed_d8_n10000",
     "lorenz_d6_box0.5_random_g2",
     "lorenz_d6_box0.5_random_g16",
@@ -1861,41 +1662,20 @@ cases = [
     "hydrogen_atom_intensity",
     "engine_intensity",
     "foot_intensity",
+    "tooth_intensity",
+    "bonsai_intensity",
 ]
 tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
 configs = ["full"]
-repetitions = 3
+repetitions = 2
 timeout_seconds = 1200
 memory_limit_gigabytes = 24
-
-[[tiers.nightly.studies]]
-name = "production"
-configs = ["production"]
-cases = [
-    "charney_devore_d12_box0.05",
-    "charney_devore_d12_box0.04",
-    "charney_devore_d12_box0.03",
-    "charney_devore_d12_box0.02",
-    "charney_devore_d12_box0.01",
-    "lorenz_d6_box2.5",
-    "lorenz_d6_box1.25",
-    "lorenz_d6_box0.5",
-    "lorenz_d6_box0.25",
-    "lorenz_d6_box0.125",
-    "dadras_d8_box24",
-    "dadras_d8_box6",
-    "dadras_d8_box3",
-]
 
 [[tiers.nightly.studies]]
 name = "thread_scaling"
 configs = ["threads_1", "threads_2", "threads_4", "threads_8", "threads_16"]
 cases = [
     "dadras_d8_box3",
-    "charney_devore_d12_box0.05",
-    "charney_devore_d12_box0.04",
-    "charney_devore_d12_box0.03",
-    "charney_devore_d12_box0.02",
     "charney_devore_d12_box0.01",
     "torus_d12",
 ]
@@ -1913,13 +1693,9 @@ cases = [
     "torus_d10",
     "torus_d11",
     "torus_d16",
-    "ball_d6_r4",
-    "ball_d8_r2",
-    "curve_d10_n10000",
     "curve_d12_n2000",
     "curve_tb_d12",
     "curve_d16_n2000",
-    "curve_d16_n10000",
     "curve_tb_d16",
     "random_top_d6_side8_p0.1_draw1",
     "random_top_d6_side8_p0.1_draw2",
@@ -1948,10 +1724,11 @@ cases = [
     "random_top_d6_side8_p0.9_draw1",
     "random_top_d6_side8_p0.9_draw2",
     "random_top_d6_side8_p0.9_draw3",
-    "random_top_d8_p0.3",
-    "random_top_d8_p0.5",
-    "random_top_d8_p0.7",
+    "random_mixed_d8_n25000",
     "random_mixed_d8_n50000",
+    "random_mixed_d10_n500",
+    "random_mixed_d10_n2000",
+    "random_mixed_d10_n5000",
     "random_mixed_d10_n10000",
     "random_mixed_d10_n50000",
     "vertebra_full",
@@ -1961,15 +1738,6 @@ configs = ["full"]
 repetitions = 3
 timeout_seconds = 3600
 memory_limit_gigabytes = 24
-
-[[tiers.full.studies]]
-name = "production"
-configs = ["production"]
-cases = [
-    "kuramoto_sivashinsky_d16_minimal",
-    "kuramoto_sivashinsky_d16_coarse",
-    "kuramoto_sivashinsky_d16_fine",
-]
 
 [[tiers.full.studies]]
 name = "stages"
