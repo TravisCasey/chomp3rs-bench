@@ -101,7 +101,7 @@ RUN curl -fsSL -o /opt/build/rustup-init \
  && /opt/build/rustup-init -y --no-modify-path --default-toolchain "${RUST_VERSION}" --profile minimal \
  && rm -f /opt/build/rustup-init
 
-ARG CHOMP3RS_COMMIT="2f15ddbcf96f9df2650000bf8265c28e782ce57a"
+ARG CHOMP3RS_COMMIT="6199ed6f883d15b531f5b6068d40e8000d83833b"
 COPY driver/ /opt/driver/
 RUN grep -q "rev = \"${CHOMP3RS_COMMIT}\"" /opt/driver/Cargo.toml \
  && grep -q "channel = \"${RUST_VERSION}\"" /opt/driver/rust-toolchain.toml \

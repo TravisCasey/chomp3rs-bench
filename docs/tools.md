@@ -7,7 +7,7 @@ version, and the limits the adapters enforce.
 
 | Tool | What it does | Source | Version | Licence | Coefficients |
 | --- | --- | --- | --- | --- | --- |
-| chomp3rs | template matching per orthant, coreduction, barcode | `https://github.com/TravisCasey/CHomP3-rs` | commit `2f15ddbcf96f9df2650000bf8265c28e782ce57a` | GPL-3.0-or-later | Z/p, p chosen |
+| chomp3rs | template matching per orthant, coreduction, barcode | `https://github.com/TravisCasey/CHomP3-rs` | commit `6199ed6f883d15b531f5b6068d40e8000d83833b` | GPL-3.0-or-later | Z/p, p chosen |
 | homcubes (CHomP, Pawel Pilarczyk) | algebraic reduction of a cube list | `http://www.pawelpilarczyk.com/chomp/download/chomp-full.zip` | archive dated 2024-02-15, sha256 `16ff175453e17c83e5cf207a7574453dbe348a26a2129759e30fce605580dbc0`, prints `ver. 3.07` | GPL-3.0-or-later | Z, or Z/p with `-p p` |
 | pyCHomP2 (Shaun Harker's CHomP, Python binding) | discrete Morse theory on a dense box | `https://github.com/marciogameiro/pyCHomP2` | commit `b7b11af5fc387a6f55f42dd8fabb8d710e50d7c6` (1.1.2) | MIT | Z/2 only |
 | Perseus (Vidit Nanda) | discrete Morse theory on a cube list | `https://people.maths.ox.ac.uk/nanda/source/perseus_4_beta.zip` | 4.0 beta, sha256 `7279091080b8b6ef8d8bbcf470a76398b752f102def222a9740f2e85ad8c7925` | unstated | Z/2 only |

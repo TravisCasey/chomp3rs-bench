@@ -21,7 +21,7 @@ use chomp3rs::{
 use clap::{Parser, ValueEnum};
 use serde::Serialize;
 
-const CHOMP3RS_REV: &str = "2f15ddbcf96f9df2650000bf8265c28e782ce57a";
+const CHOMP3RS_REV: &str = "6199ed6f883d15b531f5b6068d40e8000d83833b";
 
 #[derive(Parser)]
 #[command(about = "Run the chomp3rs pipeline on a cubical case file and print one JSON record")]

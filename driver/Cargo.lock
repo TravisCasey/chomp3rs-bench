@@ -54,10 +54,10 @@ dependencies = [
 
 [[package]]
 name = "chomp3rs"
-version = "0.3.12"
-source = "git+https://github.com/TravisCasey/CHomP3-rs.git?rev=2f15ddbcf96f9df2650000bf8265c28e782ce57a#2f15ddbcf96f9df2650000bf8265c28e782ce57a"
+version = "0.4.0"
+source = "git+https://github.com/TravisCasey/CHomP3-rs.git?rev=6199ed6f883d15b531f5b6068d40e8000d83833b#6199ed6f883d15b531f5b6068d40e8000d83833b"
 dependencies = [
- "rayon",
+ "chompar",
  "rustc-hash",
  "thiserror",
  "tracing",
@@ -72,6 +72,14 @@ dependencies = [
  "rayon",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "chompar"
+version = "0.1.0"
+source = "git+https://github.com/TravisCasey/CHomP3-rs.git?rev=6199ed6f883d15b531f5b6068d40e8000d83833b#6199ed6f883d15b531f5b6068d40e8000d83833b"
+dependencies = [
+ "rayon",
 ]
 
 [[package]]

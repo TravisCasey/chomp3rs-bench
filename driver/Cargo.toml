@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-chomp3rs = { git = "https://github.com/TravisCasey/CHomP3-rs.git", rev = "2f15ddbcf96f9df2650000bf8265c28e782ce57a", version = "0.3.12", features = ["rayon"] }
+chomp3rs = { git = "https://github.com/TravisCasey/CHomP3-rs.git", rev = "6199ed6f883d15b531f5b6068d40e8000d83833b", version = "0.4.0", features = ["rayon"] }
 clap = { version = "4.6.6", features = ["derive"] }
 rayon = "1.12.0"
 serde = { version = "1.0.229", features = ["derive"] }
