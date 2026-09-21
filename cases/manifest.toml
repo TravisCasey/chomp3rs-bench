@@ -88,23 +88,35 @@ family = "flows"
 columns = "plain"
 size = "large"
 
-[cases.kuramoto_sivashinsky_d16_minimal]
-file = "flows/kuramoto_sivashinsky_d16_minimal.csv"
+[cases.kuramoto_sivashinsky_d16_box1]
+file = "flows/kuramoto_sivashinsky_d16_box1.csv"
 family = "flows"
 columns = "plain"
 size = "small"
 
-[cases.kuramoto_sivashinsky_d16_coarse]
-file = "flows/kuramoto_sivashinsky_d16_coarse.csv"
+[cases."kuramoto_sivashinsky_d16_box0.5"]
+file = "flows/kuramoto_sivashinsky_d16_box0.5.csv"
+family = "flows"
+columns = "plain"
+size = "small"
+
+[cases."kuramoto_sivashinsky_d16_box0.25"]
+file = "flows/kuramoto_sivashinsky_d16_box0.25.csv"
 family = "flows"
 columns = "plain"
 size = "medium"
 
-[cases.kuramoto_sivashinsky_d16_fine]
-file = "flows/kuramoto_sivashinsky_d16_fine.csv"
+[cases."kuramoto_sivashinsky_d16_box0.125"]
+file = "flows/kuramoto_sivashinsky_d16_box0.125.csv"
 family = "flows"
 columns = "plain"
 size = "medium"
+
+[cases."kuramoto_sivashinsky_d16_box0.0625"]
+file = "flows/kuramoto_sivashinsky_d16_box0.0625.csv"
+family = "flows"
+columns = "plain"
+size = "large"
 
 [cases.s1_d2]
 file = "generated/s1_d2.csv"
@@ -1689,9 +1701,11 @@ cases = [
 [tiers.full]
 includes = ["nightly"]
 cases = [
-    "kuramoto_sivashinsky_d16_minimal",
-    "kuramoto_sivashinsky_d16_coarse",
-    "kuramoto_sivashinsky_d16_fine",
+    "kuramoto_sivashinsky_d16_box1",
+    "kuramoto_sivashinsky_d16_box0.5",
+    "kuramoto_sivashinsky_d16_box0.25",
+    "kuramoto_sivashinsky_d16_box0.125",
+    "kuramoto_sivashinsky_d16_box0.0625",
     "s1_d11",
     "s1_d12",
     "s1_d13",
@@ -1753,7 +1767,9 @@ memory_limit_gigabytes = 24
 name = "stages"
 configs = ["threads_16"]
 cases = [
-    "kuramoto_sivashinsky_d16_minimal",
-    "kuramoto_sivashinsky_d16_coarse",
-    "kuramoto_sivashinsky_d16_fine",
+    "kuramoto_sivashinsky_d16_box1",
+    "kuramoto_sivashinsky_d16_box0.5",
+    "kuramoto_sivashinsky_d16_box0.25",
+    "kuramoto_sivashinsky_d16_box0.125",
+    "kuramoto_sivashinsky_d16_box0.0625",
 ]

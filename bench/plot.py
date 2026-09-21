@@ -168,7 +168,7 @@ STAGE_RAMP = ("#eef8b3", "#8ed3ba", "#33a7c2", "#225da8", "#13266f")
 STAGE_LABEL_INSIDE = 11.0
 STAGE_MINIMUM_SHARE = 0.45
 STAGE_SIZE_TOKEN = re.compile(
-    r"_(box[0-9.]+|n\d+|p[0-9.]+|side\d+|draw\d+|r\d+|d\d+|random_g\d+|minimal|coarse|fine)"
+    r"_(box[0-9.]+|n\d+|p[0-9.]+|side\d+|draw\d+|r\d+|d\d+|random_g\d+)"
 )
 
 LADDER_CASE = re.compile(r"^(.+)_box([0-9.]+)$")
@@ -179,6 +179,7 @@ FLOW_SYSTEMS = {
     "lorenz": "Lorenz",
     "dadras": "Dadras",
     "charney_devore": "CdV",
+    "kuramoto_sivashinsky": "KSE",
 }
 FAMILY_NAMES = {"flows": "flow covers", "s1": "circle", "published": "images"}
 VOLUME_NAMES = {
@@ -377,13 +378,11 @@ def volume_label(name):
 CASE_LABELS = (
     (GRADED_CASE, lambda m: f"{m.group(2)} grades"),
     (
-        re.compile(r"^(lorenz|dadras|charney_devore)_d(\d+)_box([0-9.]+)$"),
+        re.compile(
+            r"^(lorenz|dadras|charney_devore|kuramoto_sivashinsky)_d(\d+)_box([0-9.]+)$"
+        ),
         lambda m: f"{FLOW_SYSTEMS[m.group(1)]}, $d = {m.group(2)}$,"
         f" scale {scale_of(m.group(3))}",
-    ),
-    (
-        re.compile(r"^kuramoto_sivashinsky_d(\d+)_(minimal|coarse|fine)$"),
-        lambda m: f"KSE, $d = {m.group(1)}$, {m.group(2)}",
     ),
     (re.compile(r"^s1_d(\d+)$"), lambda m: f"circle, $d = {m.group(1)}$"),
     (re.compile(r"^torus_d(\d+)$"), lambda m: f"torus, $d = {m.group(1)}$"),

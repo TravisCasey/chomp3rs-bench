@@ -24,14 +24,21 @@ deduplicated and in lexicographic order, no header.
 | `charney_devore_d12_box0.03.csv` | 12 | 24,735 | 0.03 |
 | `charney_devore_d12_box0.02.csv` | 12 | 44,798 | 0.02 |
 | `charney_devore_d12_box0.01.csv` | 12 | 143,295 | 0.01 |
-| `kuramoto_sivashinsky_d16_minimal.csv` | 16 | 310 | 4.0 |
-| `kuramoto_sivashinsky_d16_coarse.csv` | 16 | 41,417 | 4.0 |
-| `kuramoto_sivashinsky_d16_fine.csv` | 16 | 65,913 | 1.0 |
+| `kuramoto_sivashinsky_d16_box1.csv` | 16 | 6,890 | 1.0 |
+| `kuramoto_sivashinsky_d16_box0.5.csv` | 16 | 8,990 | 0.5 |
+| `kuramoto_sivashinsky_d16_box0.25.csv` | 16 | 15,634 | 0.25 |
+| `kuramoto_sivashinsky_d16_box0.125.csv` | 16 | 29,386 | 0.125 |
+| `kuramoto_sivashinsky_d16_box0.0625.csv` | 16 | 56,920 | 0.0625 |
 
-The six Lorenz files, the four Dadras files and the five dimension-12 files
-are each one trajectory read at several resolutions, so each system forms a
-size ladder with everything else held fixed: the flow, the sampling and the
-embedding are identical, and only the box size moves.
+The files of each system are one trajectory read at several resolutions, so
+each system forms a size ladder with everything else held fixed: the flow,
+the sampling and the embedding are identical, and only the box size moves.
+The Kuramoto-Sivashinsky trajectory is 10,000 samples spaced 0.2 apart along
+the curve, in the eight leading principal components of the field on a
+periodic domain of length 22. Its samples are already closer together than
+the resampling bound at box sizes of 0.5 and above, where the cube count
+follows the sample count rather than the box size, which is why its ladder
+runs at finer boxes than its extent alone would suggest.
 
 ## Construction
 
