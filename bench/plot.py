@@ -143,8 +143,8 @@ COVERAGE_ORDER = (
 FLOW_PANELS = (
     ("lorenz_d6", "Lorenz, $d = 6$"),
     ("dadras_d8", "Dadras, $d = 8$"),
-    ("charney_devore_d12", "Charney-DeVore, $d = 12$"),
-    ("kuramoto_sivashinsky_d16", "Kuramoto-Sivashinsky, $d = 16$"),
+    ("charney_devore_d12", "CdV, $d = 12$"),
+    ("kuramoto_sivashinsky_d16", "KSE, $d = 16$"),
 )
 MANIFOLD_PANELS = (
     ("circle", re.compile(r"^s1_d(\d+)$")),
@@ -178,8 +178,9 @@ GRADED_CASE = re.compile(r"^(.+)_random_g(\d+)$")
 FLOW_SYSTEMS = {
     "lorenz": "Lorenz",
     "dadras": "Dadras",
-    "charney_devore": "Charney-DeVore",
+    "charney_devore": "CdV",
 }
+FAMILY_NAMES = {"flows": "flow covers", "s1": "circle", "published": "images"}
 VOLUME_NAMES = {
     "silicium": "silicium",
     "fuel": "fuel",
@@ -355,9 +356,11 @@ def scale_of(box):
 
 
 def case_label(name):
-    """The name a figure gives a case: its family, then the ambient dimension,
-    then the one parameter that tells it from the rest of its family, with the
-    grade count last where the case is graded."""
+    """The name a figure gives a case beneath a heading that names its group:
+    its family, then the ambient dimension, then the one parameter that tells
+    it from the rest of its family. A randomly graded case is named by its
+    grade count alone, the heading naming the case that was graded, and a
+    published volume by the volume alone."""
     for pattern, render in CASE_LABELS:
         match = pattern.match(name)
         if match:
@@ -372,7 +375,7 @@ def volume_label(name):
 
 
 CASE_LABELS = (
-    (GRADED_CASE, lambda m: f"{case_label(m.group(1))}, grades {m.group(2)}"),
+    (GRADED_CASE, lambda m: f"{m.group(2)} grades"),
     (
         re.compile(r"^(lorenz|dadras|charney_devore)_d(\d+)_box([0-9.]+)$"),
         lambda m: f"{FLOW_SYSTEMS[m.group(1)]}, $d = {m.group(2)}$,"
@@ -380,7 +383,7 @@ CASE_LABELS = (
     ),
     (
         re.compile(r"^kuramoto_sivashinsky_d(\d+)_(minimal|coarse|fine)$"),
-        lambda m: f"Kuramoto-Sivashinsky, $d = {m.group(1)}$, {m.group(2)}",
+        lambda m: f"KSE, $d = {m.group(1)}$, {m.group(2)}",
     ),
     (re.compile(r"^s1_d(\d+)$"), lambda m: f"circle, $d = {m.group(1)}$"),
     (re.compile(r"^torus_d(\d+)$"), lambda m: f"torus, $d = {m.group(1)}$"),
@@ -390,30 +393,23 @@ CASE_LABELS = (
         re.compile(r"^ball_d(\d+)_r(\d+)$"),
         lambda m: f"ball, $d = {m.group(1)}$, radius {m.group(2)}",
     ),
-    (
-        re.compile(r"^curve_d(\d+)_n(\d+)$"),
-        lambda m: f"curve, $d = {m.group(1)}$, {m.group(2)} samples",
-    ),
+    (re.compile(r"^curve_d(\d+)_n\d+$"), lambda m: f"curve, $d = {m.group(1)}$"),
     (
         DENSITY_CASE,
-        lambda m: f"random top cubes, $d = {m.group(1)}$, side {m.group(2)},"
-        f" density {m.group(3)}, draw {m.group(4)}",
+        lambda m: f"top cubes, $d = {m.group(1)}$, density {m.group(3)}",
     ),
     (
         re.compile(r"^random_top_d(\d+)_p([0-9.]+)$"),
-        lambda m: f"random top cubes, $d = {m.group(1)}$, density {m.group(2)}",
+        lambda m: f"top cubes, $d = {m.group(1)}$, density {m.group(2)}",
     ),
     (
         re.compile(r"^random_mixed_d(\d+)_n(\d+)$"),
-        lambda m: f"random mixed cubes, $d = {m.group(1)}$, {m.group(2)} drawn",
+        lambda m: f"mixed cubes, $d = {m.group(1)}$,"
+        f" {count_text(int(m.group(2)))} drawn",
     ),
     (
-        re.compile(rf"^([a-z_]+){THRESHOLDED_SUFFIX}$"),
-        lambda m: f"{volume_label(m.group(1))}, thresholded",
-    ),
-    (
-        re.compile(rf"^([a-z_]+){INTENSITY_SUFFIX}$"),
-        lambda m: f"{volume_label(m.group(1))}, by intensity",
+        re.compile(rf"^([a-z_]+)(?:{THRESHOLDED_SUFFIX}|{INTENSITY_SUFFIX})$"),
+        lambda m: volume_label(m.group(1)),
     ),
     (
         re.compile(r"^([a-z_]+)_downsample(\d+)$"),
@@ -549,9 +545,19 @@ def log_scale(axes, which, numticks=12):
     axis.set_minor_formatter(NullFormatter())
 
 
-def count_ticks(axes):
+def count_text(value):
+    """A count in thousands or millions where it is that large."""
+    if value >= 1e6:
+        return f"{value / 1e6:g}M"
+    return f"{value / 1000:g}k" if value >= 1000 else f"{value:g}"
+
+
+def count_ticks(axes, columns):
     """A cube-count axis labelled in thousands at as few round values as the
-    span allows, so that every panel of a figure labels its counts alike."""
+    span allows, so that every panel of a figure labels its counts alike. A
+    panel of a figure of four columns has room for four labels, a wider one
+    for six."""
+    most = 4 if columns >= 4 else 6
     low, high = sorted(axes.get_xlim())
     values = []
     for subs in ((1, 2, 5), (1, 3), (1,)):
@@ -561,16 +567,10 @@ def count_ticks(axes):
             for step in subs
             if low <= step * 10**power <= high
         ]
-        if len(values) <= 6:
+        if len(values) <= most:
             break
     axes.xaxis.set_major_locator(FixedLocator(values))
-    axes.xaxis.set_major_formatter(
-        FuncFormatter(
-            lambda value, _: f"{value / 1e6:g}M"
-            if value >= 1e6
-            else (f"{value / 1000:g}k" if value >= 1000 else f"{value:g}")
-        )
-    )
+    axes.xaxis.set_major_formatter(FuncFormatter(lambda value, _: count_text(value)))
     axes.xaxis.set_minor_formatter(NullFormatter())
     axes.set_xlim(low, high)
 
@@ -692,7 +692,7 @@ def draw_flow_ladders(tables, width, label):
                 used.append(tool)
         for line in (0, 1):
             log_scale(grid[line][column], "x")
-        count_ticks(grid[1][column])
+        count_ticks(grid[1][column], len(panels))
         name_panel(grid[0][column], title)
     label_time_and_memory(grid)
     name_shared_axis(figure, "top cubes in the cover")
@@ -744,7 +744,9 @@ def draw_dimension_manifolds(tables, width, label):
 def draw_spread(axes, tables, tool, entries):
     """One tool's median over the draws at each density, joined across the
     densities, with a stroke from the least to the greatest draw; a density at
-    which no draw finished has no mark."""
+    which no draw finished has no mark. CHomP3-rs is drawn above the others, as
+    in `plot_series`."""
+    above = 3 if tool == manifest.CHOMP3RS else 0
     by_density = {}
     disputed = set()
     for density, row in entries:
@@ -758,18 +760,22 @@ def draw_spread(axes, tables, tool, entries):
     medians = [statistics.median(by_density[density]) for density in densities]
     color = TOOL_STYLE[tool]["color"]
     if len(densities) > 1:
-        axes.plot(densities, medians, color=color, linewidth=LINE_WIDTH, zorder=2)
+        axes.plot(densities, medians, color=color, linewidth=LINE_WIDTH, zorder=2 + above)
     for density, median in zip(densities, medians):
         values = by_density[density]
         axes.plot(
-            [density, density], [min(values), max(values)], color=color, linewidth=0.8, zorder=2
+            [density, density],
+            [min(values), max(values)],
+            color=color,
+            linewidth=0.8,
+            zorder=2 + above,
         )
         axes.plot(
-            [density], [median], linestyle="none", zorder=3, **marker_arguments(tool)
+            [density], [median], linestyle="none", zorder=3 + above, **marker_arguments(tool)
         )
         if density in disputed:
             axes.plot(
-                [density], [median], linestyle="none", zorder=4, **disputed_ring_arguments()
+                [density], [median], linestyle="none", zorder=7, **disputed_ring_arguments()
             )
 
 
@@ -808,7 +814,7 @@ def draw_density_random_top(tables, width, label):
         densities = sorted({density for density, _ in entries})
         axes.xaxis.set_major_locator(FixedLocator(densities))
         axes.set_xticklabels([f"{density:g}" for density in densities])
-        name_panel(axes, f"$d = {dimension}$, side {side}")
+        name_panel(axes, f"$d = {dimension}$, box {side} cubes per side")
     axes_list[0].set_ylabel("wall time (s)")
     name_shared_axis(figure, "share of positions holding a top cube")
     return finish_figure(
@@ -847,7 +853,7 @@ def draw_mixed_dimension(tables, width, label):
             log_scale(grid[line][column], "x")
         low, high = grid[1][column].get_xlim()
         grid[1][column].set_xlim(low / 1.3, high * 1.3)
-        count_ticks(grid[1][column])
+        count_ticks(grid[1][column], len(panels))
         name_panel(grid[0][column], f"$d = {dimension}$")
     label_time_and_memory(grid)
     name_shared_axis(figure, "maximal cubes in the case")
@@ -893,10 +899,10 @@ def draw_grade_count(tables, width, label):
         axes.set_xscale("log")
         axes.xaxis.set_major_locator(FixedLocator(counts))
         axes.set_xticklabels(
-            [str(int(count)) for count in counts],
-            rotation=35,
-            ha="right",
-            rotation_mode="anchor",
+            [
+                "" if later is not None and later < 3 * count else str(int(count))
+                for count, later in zip(counts, counts[1:] + [None])
+            ]
         )
         axes.xaxis.set_minor_locator(NullLocator())
         log_scale(axes, "y")
@@ -947,13 +953,17 @@ def draw_published_sets(tables, width, label):
     cubes = {row["case"]: number_of(row, "cube_count") for row in rows}
     drawn = drawn_cases(tables, rows, TIME_AXIS)
     blocks = []
+    order = {}
     for suffix, title in (
         (THRESHOLDED_SUFFIX, "thresholded"),
         (INTENSITY_SUFFIX, "graded by intensity"),
     ):
         names = sorted(
-            (name for name in drawn if name.endswith(suffix)), key=lambda n: cubes[n]
+            (name for name in drawn if name.endswith(suffix)),
+            key=lambda n: (order.get(n[: -len(suffix)], len(order)), cubes[n]),
         )
+        for name in names:
+            order.setdefault(name[: -len(suffix)], len(order))
         if names:
             blocks.append((title, suffix, names))
     height = ROW_HEIGHT_INCHES * sum(len(names) for _, _, names in blocks) + 1.7
@@ -1037,7 +1047,13 @@ def stage_case_groups(tables, totals):
             (case for case in graded if GRADED_CASE.match(case).group(1) == base),
             key=lambda case: int(GRADED_CASE.match(case).group(2)),
         )
-        groups.insert(2, ("randomly graded", [counts[0], counts[-1]] if len(counts) > 1 else counts))
+        groups.insert(
+            2,
+            (
+                f"randomly graded: {case_label(base)}",
+                [counts[0], counts[-1]] if len(counts) > 1 else counts,
+            ),
+        )
     return [(title, names) for title, names in groups if names]
 
 
@@ -1058,6 +1074,14 @@ def drawn_widths(shares):
     return [100 * value / total for value in lifted]
 
 
+def share_text(share):
+    """A share to the whole percent, and `>99` rather than 100 where the case
+    spent time in another stage as well."""
+    if share < 100 and round(share) == 100:
+        return "$>$99\\%"
+    return f"{share:.0f}\\%"
+
+
 def draw_stage_shares(tables, width, label):
     """Where CHomP3-rs spends its time: the share of its stage total each stage
     takes, one row per case grouped by family, with the stage total beside it."""
@@ -1075,7 +1099,7 @@ def draw_stage_shares(tables, width, label):
         figsize=(width, height),
         squeeze=False,
         sharex="col",
-        gridspec_kw={"height_ratios": [len(names) for _, names in groups], "width_ratios": [3.4, 1.0]},
+        gridspec_kw={"height_ratios": [len(names) for _, names in groups], "width_ratios": [3.4, 1.4]},
     )
     for line, (title, names) in enumerate(groups):
         left, right = grid[line]
@@ -1103,7 +1127,7 @@ def draw_stage_shares(tables, width, label):
                     left.text(
                         start + drawn / 2,
                         index,
-                        f"{shares[position]:.0f}\\%",
+                        share_text(shares[position]),
                         ha="center",
                         va="center",
                         fontsize=7,
@@ -1136,6 +1160,7 @@ def draw_stage_shares(tables, width, label):
     log_scale(grid[-1][1], "x", numticks=6)
     grid[-1][0].set_xlabel("share of the CHomP3-rs stage total (\\%)")
     grid[-1][1].set_xlabel("stage total (s)")
+    figure.align_xlabels(list(grid[-1]))
     handles = [
         Patch(facecolor=STAGE_RAMP[position], label=name)
         for position, (name, _) in enumerate(STAGE_BARS)
@@ -1217,7 +1242,7 @@ def draw_coverage(tables, width, label):
         axes.text(
             start + count / 2,
             -0.55,
-            family.replace("_", " "),
+            FAMILY_NAMES.get(family, family.replace("_", " ")),
             ha="left",
             va="bottom",
             fontsize=8,
@@ -1248,7 +1273,7 @@ def draw_coverage(tables, width, label):
     figure.legend(
         handles=handles,
         loc="outside lower center",
-        ncol=3,
+        ncol=2,
         handlelength=1.2,
         handleheight=1.0,
         borderaxespad=0.2,

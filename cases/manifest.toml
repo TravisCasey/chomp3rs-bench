@@ -151,6 +151,33 @@ generator = "s1"
 seed = 5
 parameters = { dimension = 12, samples = 200 }
 
+[cases.s1_d13]
+file = "generated/s1_d13.csv"
+family = "s1"
+columns = "plain"
+size = "small"
+generator = "s1"
+seed = 202
+parameters = { dimension = 13, samples = 200 }
+
+[cases.s1_d14]
+file = "generated/s1_d14.csv"
+family = "s1"
+columns = "plain"
+size = "medium"
+generator = "s1"
+seed = 203
+parameters = { dimension = 14, samples = 200 }
+
+[cases.s1_d15]
+file = "generated/s1_d15.csv"
+family = "s1"
+columns = "plain"
+size = "medium"
+generator = "s1"
+seed = 204
+parameters = { dimension = 15, samples = 200 }
+
 [cases.s1_d16]
 file = "generated/s1_d16.csv"
 family = "s1"
@@ -204,6 +231,33 @@ size = "medium"
 generator = "torus"
 seed = 11
 parameters = { dimension = 12, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
+
+[cases.torus_d13]
+file = "generated/torus_d13.csv"
+family = "torus"
+columns = "plain"
+size = "medium"
+generator = "torus"
+seed = 205
+parameters = { dimension = 13, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
+
+[cases.torus_d14]
+file = "generated/torus_d14.csv"
+family = "torus"
+columns = "plain"
+size = "medium"
+generator = "torus"
+seed = 206
+parameters = { dimension = 14, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
+
+[cases.torus_d15]
+file = "generated/torus_d15.csv"
+family = "torus"
+columns = "plain"
+size = "medium"
+generator = "torus"
+seed = 207
+parameters = { dimension = 15, samples_per_circle = 640, major_radius = 16.0, minor_radius = 8.0 }
 
 [cases.torus_d16]
 file = "generated/torus_d16.csv"
@@ -330,6 +384,15 @@ size = "small"
 generator = "curve"
 seed = 54
 parameters = { dimension = 12, modes = 3, samples = 2000 }
+
+[cases.curve_d14_n2000]
+file = "generated/curve_d14_n2000.csv"
+family = "curve"
+columns = "plain"
+size = "small"
+generator = "curve"
+seed = 55
+parameters = { dimension = 14, modes = 3, samples = 2000 }
 
 [cases.curve_d16_n2000]
 file = "generated/curve_d16_n2000.csv"
@@ -1204,15 +1267,6 @@ generator = "random_mixed"
 seed = 176
 parameters = { dimension = 10, side = 4, count = 10000, minimum_cube_dimension = 1, maximum_cube_dimension = 10 }
 
-[cases.random_mixed_d10_n50000]
-file = "generated/random_mixed_d10_n50000.csv"
-family = "random_mixed"
-columns = "extent"
-size = "large"
-generator = "random_mixed"
-seed = 177
-parameters = { dimension = 10, side = 4, count = 50000, minimum_cube_dimension = 1, maximum_cube_dimension = 10 }
-
 [cases.random_mixed_d6_n5000]
 file = "generated/random_mixed_d6_n5000.csv"
 family = "random_mixed"
@@ -1640,12 +1694,19 @@ cases = [
     "kuramoto_sivashinsky_d16_fine",
     "s1_d11",
     "s1_d12",
+    "s1_d13",
+    "s1_d14",
+    "s1_d15",
     "s1_d16",
     "torus_d9",
     "torus_d10",
     "torus_d11",
+    "torus_d13",
+    "torus_d14",
+    "torus_d15",
     "torus_d16",
     "curve_d12_n2000",
+    "curve_d14_n2000",
     "curve_d16_n2000",
     "random_top_d6_side8_p0.1_draw1",
     "random_top_d6_side8_p0.1_draw2",
@@ -1680,7 +1741,6 @@ cases = [
     "random_mixed_d10_n2000",
     "random_mixed_d10_n5000",
     "random_mixed_d10_n10000",
-    "random_mixed_d10_n50000",
     "vertebra_full",
 ]
 tools = ["chomp3rs", "homcubes", "pychomp2", "perseus", "gudhi", "dipha", "cubical_ripser"]
