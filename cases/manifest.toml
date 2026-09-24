@@ -98,7 +98,7 @@ size = "small"
 file = "flows/kuramoto_sivashinsky_d16_box0.5.csv"
 family = "flows"
 columns = "plain"
-size = "small"
+size = "medium"
 
 [cases."kuramoto_sivashinsky_d16_box0.25"]
 file = "flows/kuramoto_sivashinsky_d16_box0.25.csv"
@@ -108,12 +108,6 @@ size = "medium"
 
 [cases."kuramoto_sivashinsky_d16_box0.125"]
 file = "flows/kuramoto_sivashinsky_d16_box0.125.csv"
-family = "flows"
-columns = "plain"
-size = "medium"
-
-[cases."kuramoto_sivashinsky_d16_box0.0625"]
-file = "flows/kuramoto_sivashinsky_d16_box0.0625.csv"
 family = "flows"
 columns = "plain"
 size = "large"
@@ -1705,7 +1699,6 @@ cases = [
     "kuramoto_sivashinsky_d16_box0.5",
     "kuramoto_sivashinsky_d16_box0.25",
     "kuramoto_sivashinsky_d16_box0.125",
-    "kuramoto_sivashinsky_d16_box0.0625",
     "s1_d11",
     "s1_d12",
     "s1_d13",
@@ -1771,5 +1764,4 @@ cases = [
     "kuramoto_sivashinsky_d16_box0.5",
     "kuramoto_sivashinsky_d16_box0.25",
     "kuramoto_sivashinsky_d16_box0.125",
-    "kuramoto_sivashinsky_d16_box0.0625",
 ]

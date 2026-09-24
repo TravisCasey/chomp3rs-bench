@@ -10,7 +10,7 @@
       7
     ],
     [
-      -8,
+      -10,
       7
     ],
     [
@@ -30,7 +30,7 @@
       3
     ],
     [
-      -4,
+      -5,
       3
     ],
     [
@@ -51,10 +51,10 @@
     ],
     [
       -3,
-      2
+      3
     ],
     [
-      -3,
+      -4,
       3
     ],
     [
@@ -66,8 +66,8 @@
       3
     ]
   ],
-  "bounding_box_volume": 5195192441241600,
-  "cube_count": 6890,
+  "bounding_box_volume": 8766887244595200,
+  "cube_count": 20250,
   "family": "flows",
   "grade_count": null,
   "graded": false,

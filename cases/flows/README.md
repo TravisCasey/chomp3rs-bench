@@ -24,16 +24,15 @@ deduplicated and in lexicographic order, no header.
 | `charney_devore_d12_box0.03.csv` | 12 | 24,735 | 0.03 |
 | `charney_devore_d12_box0.02.csv` | 12 | 44,798 | 0.02 |
 | `charney_devore_d12_box0.01.csv` | 12 | 143,295 | 0.01 |
-| `kuramoto_sivashinsky_d16_box1.csv` | 16 | 6,890 | 1.0 |
-| `kuramoto_sivashinsky_d16_box0.5.csv` | 16 | 8,990 | 0.5 |
-| `kuramoto_sivashinsky_d16_box0.25.csv` | 16 | 15,634 | 0.25 |
-| `kuramoto_sivashinsky_d16_box0.125.csv` | 16 | 29,386 | 0.125 |
-| `kuramoto_sivashinsky_d16_box0.0625.csv` | 16 | 56,920 | 0.0625 |
+| `kuramoto_sivashinsky_d16_box1.csv` | 16 | 20,250 | 1.0 |
+| `kuramoto_sivashinsky_d16_box0.5.csv` | 16 | 26,740 | 0.5 |
+| `kuramoto_sivashinsky_d16_box0.25.csv` | 16 | 46,733 | 0.25 |
+| `kuramoto_sivashinsky_d16_box0.125.csv` | 16 | 87,903 | 0.125 |
 
 The files of each system are one trajectory read at several resolutions, so
 each system forms a size ladder with everything else held fixed: the flow,
 the sampling and the embedding are identical, and only the box size moves.
-The Kuramoto-Sivashinsky trajectory is 10,000 samples spaced 0.2 apart along
+The Kuramoto-Sivashinsky trajectory is 30,000 samples spaced 0.2 apart along
 the curve, in the eight leading principal components of the field on a
 periodic domain of length 22. Its samples are already closer together than
 the resampling bound at box sizes of 0.5 and above, where the cube count
