@@ -21,6 +21,8 @@ turns the results into tables and figures.
   every case, every tool configuration and every tier.
 - `Containerfile` builds the one image that holds every tool compared and the
   driver, each at a pinned revision.
+- `cluster/` builds the driver with its MPI backends on the OSCER cluster and
+  runs the chomp3rs scaling study there as a Slurm job, outside the container.
 - `results/` holds one JSON record per measured run under `results/runs/` and
   the summary tables under `results/summary/`.
 - `figures/` holds the figures, one directory per tier.

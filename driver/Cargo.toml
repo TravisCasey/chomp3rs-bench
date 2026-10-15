@@ -3,6 +3,9 @@ name = "chomp3rs-driver"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+mpi = ["chomp3rs/mpi"]
+
 [dependencies]
 chomp3rs = { git = "https://github.com/TravisCasey/CHomP3-rs.git", rev = "6199ed6f883d15b531f5b6068d40e8000d83833b", version = "0.4.0", features = ["rayon"] }
 clap = { version = "4.6.6", features = ["derive"] }

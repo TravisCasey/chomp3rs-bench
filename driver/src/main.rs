@@ -3,9 +3,13 @@
 //!
 //! ```text
 //! chomp3rs-driver <case.csv> --columns plain|graded|extent|graded_extent
-//!     [--backend sequential|rayon] [--threads N]
+//!     [--backend sequential|rayon|mpi|hybrid] [--threads N]
 //!     [--max-critical-dimension K] [--modulus P]
 //! ```
+//!
+//! The `mpi` and `hybrid` backends exist when the driver is built with the
+//! `mpi` feature and are launched under `mpirun` or `srun`. Every rank runs
+//! the whole pipeline and only rank 0 prints the record.
 
 use std::{
     fs,
@@ -34,8 +38,8 @@ struct Arguments {
     /// Execution backend the library dispatches on.
     #[arg(long, value_enum, default_value_t = Backend::Sequential)]
     backend: Backend,
-    /// Rayon thread count; the sequential backend runs on one thread whatever
-    /// this says.
+    /// Rayon thread count, per rank on the hybrid backend; the sequential and
+    /// mpi backends run on one thread whatever this says.
     #[arg(long, default_value_t = 1)]
     threads: usize,
     /// Cap on the dimension of the critical cells the matching reports.
@@ -70,6 +74,10 @@ impl Columns {
 enum Backend {
     Sequential,
     Rayon,
+    #[cfg(feature = "mpi")]
+    Mpi,
+    #[cfg(feature = "mpi")]
+    Hybrid,
 }
 
 impl Backend {
@@ -77,6 +85,10 @@ impl Backend {
         match self {
             Self::Sequential => "sequential",
             Self::Rayon => "rayon",
+            #[cfg(feature = "mpi")]
+            Self::Mpi => "mpi",
+            #[cfg(feature = "mpi")]
+            Self::Hybrid => "hybrid",
         }
     }
 }
@@ -110,6 +122,7 @@ struct Record {
 #[derive(Serialize)]
 struct Config {
     backend: &'static str,
+    ranks: usize,
     threads: usize,
     columns: &'static str,
     max_critical_dimension: Option<u32>,
@@ -144,6 +157,22 @@ fn stage(name: &'static str, seconds: f64, cells_in: usize, cells_out: usize) ->
 fn fail(message: &str) -> ! {
     eprintln!("{message}");
     exit(1);
+}
+
+fn build_thread_pool(threads: usize) {
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(threads)
+        .build_global()
+        .unwrap_or_else(|error| fail(&format!("could not build the rayon thread pool: {error}")));
+}
+
+#[cfg(feature = "mpi")]
+fn world(
+    universe: Option<&chomp3rs::parallel::mpi::Universe>,
+) -> chomp3rs::parallel::mpi::SimpleCommunicator {
+    universe
+        .unwrap_or_else(|| fail("MPI was not initialized"))
+        .world()
 }
 
 /// Read a case file whose last column is an extent string, one character per
@@ -205,18 +234,31 @@ fn main() {
     let arguments = Arguments::parse();
     let case_path = &arguments.case_path;
 
+    // The universe finalizes MPI when dropped, so it is declared before the
+    // backend whose communicator it must outlive.
+    #[cfg(feature = "mpi")]
+    let universe = matches!(arguments.backend, Backend::Mpi | Backend::Hybrid).then(|| {
+        chomp3rs::parallel::mpi::initialize().unwrap_or_else(|| fail("MPI was already initialized"))
+    });
+
     let (backend, threads) = match arguments.backend {
         Backend::Sequential => (ExecutionBackend::Sequential, 1),
         Backend::Rayon => {
-            rayon::ThreadPoolBuilder::new()
-                .num_threads(arguments.threads)
-                .build_global()
-                .unwrap_or_else(|error| {
-                    fail(&format!("could not build the rayon thread pool: {error}"))
-                });
+            build_thread_pool(arguments.threads);
             (ExecutionBackend::Rayon, arguments.threads)
         }
+        #[cfg(feature = "mpi")]
+        Backend::Mpi => (ExecutionBackend::MPI(world(universe.as_ref())), 1),
+        #[cfg(feature = "mpi")]
+        Backend::Hybrid => {
+            build_thread_pool(arguments.threads);
+            (
+                ExecutionBackend::Hybrid(world(universe.as_ref())),
+                arguments.threads,
+            )
+        }
     };
+    let ranks = backend.process_count().unwrap_or(1);
 
     let field = Field::new(arguments.modulus);
     let mut stages = Vec::new();
@@ -328,6 +370,7 @@ fn main() {
         tool_version: CHOMP3RS_REV,
         config: Config {
             backend: arguments.backend.name(),
+            ranks,
             threads,
             columns: arguments.columns.name(),
             max_critical_dimension: arguments.max_critical_dimension,
@@ -342,10 +385,12 @@ fn main() {
         },
     };
 
-    println!(
-        "{}",
-        serde_json::to_string_pretty(&record).unwrap_or_else(|error| {
-            fail(&format!("could not write the result record: {error}"))
-        })
-    );
+    if backend.rank() == 0 {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&record).unwrap_or_else(|error| {
+                fail(&format!("could not write the result record: {error}"))
+            })
+        );
+    }
 }

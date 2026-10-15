@@ -395,16 +395,16 @@ CASE_LABELS = (
     (re.compile(r"^curve_d(\d+)_n\d+$"), lambda m: f"curve, $d = {m.group(1)}$"),
     (
         DENSITY_CASE,
-        lambda m: f"top cubes, $d = {m.group(1)}$, density {m.group(3)}",
+        lambda m: f"top-dimensional cubes,\n$d = {m.group(1)}$, density {m.group(3)}",
     ),
     (
         re.compile(r"^random_top_d(\d+)_p([0-9.]+)$"),
-        lambda m: f"top cubes, $d = {m.group(1)}$, density {m.group(2)}",
+        lambda m: f"top-dimensional cubes, $d = {m.group(1)}$,\ndensity {m.group(2)}",
     ),
     (
         re.compile(r"^random_mixed_d(\d+)_n(\d+)$"),
-        lambda m: f"mixed cubes, $d = {m.group(1)}$,"
-        f" {count_text(int(m.group(2)))} drawn",
+        lambda m: f"mixed cubes, $d = {m.group(1)}$,\n"
+        f"{count_text(int(m.group(2)))} cubes sampled",
     ),
     (
         re.compile(rf"^([a-z_]+)(?:{THRESHOLDED_SUFFIX}|{INTENSITY_SUFFIX})$"),
@@ -661,7 +661,7 @@ def draw_time_and_memory(tables, grid, column, rows, position_of, connect=True, 
 
 
 def label_time_and_memory(grid):
-    grid[0][0].set_ylabel("wall time (s)")
+    grid[0][0].set_ylabel("runtime (s)")
     grid[1][0].set_ylabel("peak memory (GB)")
 
 
@@ -694,7 +694,7 @@ def draw_flow_ladders(tables, width, label):
         count_ticks(grid[1][column], len(panels))
         name_panel(grid[0][column], title)
     label_time_and_memory(grid)
-    name_shared_axis(figure, "top cubes in the cover")
+    name_shared_axis(figure, "top-dimensional cubes")
     return finish_figure(
         figure, tool_handles([t for t in TOOL_ORDER if t in used], True), width
     )
@@ -813,9 +813,9 @@ def draw_density_random_top(tables, width, label):
         densities = sorted({density for density, _ in entries})
         axes.xaxis.set_major_locator(FixedLocator(densities))
         axes.set_xticklabels([f"{density:g}" for density in densities])
-        name_panel(axes, f"$d = {dimension}$, box {side} cubes per side")
-    axes_list[0].set_ylabel("wall time (s)")
-    name_shared_axis(figure, "share of positions holding a top cube")
+        name_panel(axes, f"$d = {dimension}$, {side} cubes per side")
+    axes_list[0].set_ylabel("runtime (s)")
+    name_shared_axis(figure, "top-dimensional cube density")
     return finish_figure(
         figure,
         tool_handles(tools_present(tables, rows, TIME_AXIS), True),
@@ -855,7 +855,7 @@ def draw_mixed_dimension(tables, width, label):
         count_ticks(grid[1][column], len(panels))
         name_panel(grid[0][column], f"$d = {dimension}$")
     label_time_and_memory(grid)
-    name_shared_axis(figure, "maximal cubes in the case")
+    name_shared_axis(figure, "maximal cubes")
     return finish_figure(
         figure, tool_handles([t for t in TOOL_ORDER if t in used], True), width
     )
@@ -906,8 +906,8 @@ def draw_grade_count(tables, width, label):
         axes.xaxis.set_minor_locator(NullLocator())
         log_scale(axes, "y")
         name_panel(axes, case_label(base))
-    axes_list[0].set_ylabel("wall time (s)")
-    name_shared_axis(figure, "grades in the filtration")
+    axes_list[0].set_ylabel("runtime (s)")
+    name_shared_axis(figure, "grade count")
     return finish_figure(
         figure, tool_handles(tools_present(tables, rows, TIME_AXIS), True), width
     )
@@ -982,7 +982,7 @@ def draw_published_sets(tables, width, label):
             [volume_label(name[: -len(suffix)]) for name in names]
         )
         grid[line][0].set_title(title, loc="left", fontsize=9, color=INK)
-    grid[-1][0].set_xlabel("wall time (s)")
+    grid[-1][0].set_xlabel("runtime (s)")
     grid[-1][1].set_xlabel("peak memory (GB)")
     return finish_figure(figure, tool_handles(tools, False), width)
 
@@ -1157,8 +1157,8 @@ def draw_stage_shares(tables, width, label):
         right.grid(axis="x", visible=True)
         left.set_title(title, loc="left", fontsize=9, color=INK)
     log_scale(grid[-1][1], "x", numticks=6)
-    grid[-1][0].set_xlabel("share of the CHomP3-rs stage total (\\%)")
-    grid[-1][1].set_xlabel("stage total (s)")
+    grid[-1][0].set_xlabel("CHomP3-rs runtime by stage (\\%)")
+    grid[-1][1].set_xlabel("runtime (s)")
     figure.align_xlabels(list(grid[-1]))
     handles = [
         Patch(facecolor=STAGE_RAMP[position], label=name)
