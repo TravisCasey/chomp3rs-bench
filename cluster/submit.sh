@@ -10,7 +10,7 @@
 #SBATCH --constraint=6338
 #SBATCH --nodes=8
 #SBATCH --exclusive
-#SBATCH --mem=120G
+#SBATCH --mem=0
 #SBATCH --time=04:00:00
 #SBATCH --output=%x-%j.out
 
