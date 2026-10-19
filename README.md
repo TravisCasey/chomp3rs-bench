@@ -129,15 +129,6 @@ Measurements are taken one tier at a time. A tier names the cases to measure,
 how many times each measurement is repeated, how long one run may take before
 it is stopped, and how much memory one run may use before it is killed.
 
-| Tier | Budget | Measured | Repetitions | Timeout per run | Memory cap |
-| --- | --- | --- | --- | --- | --- |
-| `smoke` | 10 minutes | 3 minutes 42 seconds | 1 | 1 minute | 24 GB |
-| `quick` | 1 hour | not yet measured | 3 | 5 minutes | 24 GB |
-| `nightly` | 8 hours | not yet measured | 2 | 20 minutes | 24 GB |
-| `full` | 48 hours | not yet measured | 3 | 60 minutes | 24 GB |
-
-What each tier holds beyond the smaller ones:
-
 - `smoke` is the correctness gate: one of the smaller cases of every family,
   with a graded case, a mixed-dimension case and a volume among them, a single
   cube, and the `production` configuration on the smallest flow cover.
@@ -173,21 +164,6 @@ more memory than the cap allows, costs nothing. A tier that was interrupted is
 resumed by running it again: it converts the cases of every run it can do, as
 it did the first time, and then passes over each run whose record already
 exists. To measure a case again, delete its records first.
-
-```
-uv run bench run <tier> --dry-run
-```
-
-prints one line per run saying whether it would run or be skipped and why, and
-ends with a ceiling: every run that is not skipped charged the whole of its
-timeout.
-
-| Tier | Runnable | Planned | Ceiling |
-| --- | --- | --- | --- |
-| `smoke` | 72 | 85 | 72 minutes |
-| `quick` | 198 | 240 | 50 hours |
-| `nightly` | 653 | 864 | 435 hours |
-| `full` | 858 | 1210 | 2574 hours |
 
 ## Checking the answers
 
@@ -332,16 +308,6 @@ source. Each file sits at `<collection>/<name>/<name>_<grid>_<type>.raw` under
 the archive name in the table below, as a raw array of little-endian values
 with no header.
 
-### How the volumes are licensed and used here
-
-The collection states no licence, for itself or for any volume in it. Its one
-request is that each dataset be cited so that its authors are credited. The
-suite is arranged to respect that: the volumes are downloaded when a case is
-generated, each download is checked against the sha512 hash the collection
-publishes for it, and no volume and nothing derived from one is kept in this
-repository. Every case records the URL it came from and that hash beside its
-cubes, and each volume is credited below by the acknowledgement.
-
 ### From a volume to a case
 
 A volume is a grid of intensities; a case is a list of cubes. Two numbers make
@@ -382,21 +348,6 @@ German Research Council (DFG); Marschner-Lobb to Marschner and Lobb; Engine to
 General Electric; Aneurysm and Foot to Philips Research, Hamburg; Bonsai to S.
 Roettger, VIS, University of Stuttgart; vertebra to Michael Meissner,
 Viatronix Inc. The collection names no source for Tooth.
-
-## Deferred comparisons
-
-Two comparisons the suite is built for and does not yet run.
-
-**The lift comparison.** chomp3rs and pyCHomP2 both lift a homology class back
-to a cycle and a cocycle of the original complex, which the Betti numbers alone
-do not give. Timing both lifts on the H^1 bars of the flow covers attaches as a
-flag on the driver and a second pyCHomP2 configuration.
-
-**The MPI study.** DIPHA distributes its matrix reduction across MPI ranks and
-chomp3rs has an MPI feature of its own. Measuring both at 1, 2, 4, 8 and 16
-ranks says how each of them scales with the ranks it is given. It attaches as a
-tier with a rank axis and a wrapper that submits a job instead of starting a
-single container.
 
 ## License
 
